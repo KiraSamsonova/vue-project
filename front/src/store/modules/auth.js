@@ -1,0 +1,119 @@
+import router from '@/router/index.js'
+import axios from 'axios'
+export default {
+
+    actions: {
+        async axiosAuth(ctx, value) {
+            ctx.commit('auth_request')
+            const res = await axios({
+                url: 'http://localhost:8080/account/authentification', data: value, method: 'POST'
+            })
+                .then(response => {
+                    let r = response.data
+                    // console.log(r)
+                    if (r.success === false) {
+                        //  console.log(r.msg)
+                        ctx.commit('auth_error', r.msg)
+                    } else {
+                        const token = r.token
+                        const user = r.user
+
+                        if (r.favourites) {
+                            localStorage.setItem('favArr', JSON.stringify(r.favourites))
+                        }
+                        console.log(user)
+
+                        localStorage.setItem('user-token', token)
+                        localStorage.setItem('user', JSON.stringify(user))
+                        axios.defaults.headers.common['Authorization'] = token
+                        ctx.commit('auth_success', [token, user])
+                        router.push('/dashboard')
+                    }
+                })
+                .catch(error => {
+                    console.log(error)
+                    localStorage.removeItem('user-token')
+                });
+        },
+
+        logout(ctx) {
+            ctx.commit('logout')
+            localStorage.removeItem('user-token')
+            localStorage.removeItem('user')
+            localStorage.removeItem('favArr')
+            delete axios.defaults.headers.common['Authorization']
+            router.push('/login')
+        }
+    },
+
+    mutations: {
+        authentificationResponse(state, response) {
+            // localStorage.setItem('email', JSON.stringify(response.user.email))
+            // localStorage.setItem('id', JSON.stringify(response.user._id))
+
+            state.registrationResponse = response
+            if (response.success == true) {
+                router.push('dashboard')
+            }
+        },
+        auth_request(state) {
+            state.status = 'loading'
+        },
+        auth_success(state, arr) {
+
+            state.status = 'success'
+            state.token = arr[0]
+            state.user = arr[1]
+            console.log(arr[1])
+
+        },
+        auth_error(state, response) {
+            state.errMsg = response
+        },
+        logout(state) {
+            state.status = ''
+            state.token = ''
+        },
+        changeEmail(state, updatedData) {
+            let user = JSON.parse(localStorage.getItem('user'))
+            user.email = updatedData.email,
+                user.isParticipant = updatedData.isParticipant
+            localStorage.setItem('user', JSON.stringify(user))
+            console.log(state.user.email)
+            state.user = user
+        },
+
+    },
+    state: {
+        errMsg: "",
+        authentificationResponse: {},
+        status: '',
+        token: localStorage.getItem('user-token') || null,
+        user: JSON.parse(localStorage.getItem('user')) || {},
+
+    },
+
+
+    getters: {
+        getAuthentificationResponse(state) {
+            return state.authentificationResponse
+        },
+        isLoggedIn(state) {
+
+            return !!state.token
+        },
+        authStatus(state) {
+
+            return state.status
+        },
+        errMsg(state) {
+            return state.errMsg
+        },
+        getUser(state) {
+
+            console.log(state.user)
+            return state.user
+        },
+
+    },
+}
