@@ -46,7 +46,10 @@ mongoose.connection.on('error', (err) => {
 
 //partisipants.newFunc() 
 
+// app.use(express.static(__dirname + '/public/'));
 
+// // Handle SPA
+// app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
 
 app.listen(port, () => {
