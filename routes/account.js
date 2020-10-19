@@ -1,4 +1,5 @@
 require('dotenv').config()
+const bcrypt = require('bcryptjs');
 const express = require('express');
 const router = express.Router()
 const User = require('../models/user')
@@ -57,85 +58,65 @@ router.post('/registration', (req, res) => {
         } else {
             console.log('Email is origin, new user creation proccess is beginning')
 
-            // СОЗДАЕМ ССЫЛКУ ДЛЯ ПОДТВЕРЖДЕНИЯ EMAIL
-            // function confirmEmailString() {
-            //     // Создаём псевдоуникальную строку на основе почты
-            //     let confirmEmailStringRow = `${req.body.email.length * 3}${req.body.email[1]}${req.body.login[1]}g${req.body.email.length * 4}mo${req.body.email[2]}bh${req.body.login[0]}${req.body.email.length * 5}${req.body.email[3]}tt${req.body.email[0]}${req.body.login[2]}${req.body.login.length * 3}`
-
-
-            //     let confirmation = `confirm${confirmEmailStringRow}`
-            //     return confirmation
-            // }
-
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(email, salt, (err, hash) => {
+                    if (err) throw err
+                    // passlink creation process
+                    let emailConfirmLink = hash
+                    emailConfirmLink = emailConfirmLink.split('.').join('').split('/').join('')
+           
             // Проверяем isParticipant 
-            Emails.getEmails((err, emails) => {
-                if (err)
-                    res.json({ success: false, msg: 'Ошибка в бд' })
-                let emailArr = emails[0].emails
-                let isParticipant = false
-                if (emailArr.includes(email))
-                    isParticipant = true
+                    Emails.getEmails((err, emails) => {
+                        if (err) res.json({ success: false, msg: 'Ошибка в бд' })
+                        let emailArr = emails[0].emails
+                        let isParticipant = false
+                        if (emailArr.includes(email))
+                            isParticipant = true
 
+                        // СОЗДАЁМ МОДЕЛЬ USER ДЛЯ BD
+                        let newUser = new User({
 
-                // СОЗДАЁМ МОДЕЛЬ USER ДЛЯ BD
-                let newUser = new User({
+                            email: email,
+                            isConfirmed: false,
+                            emailConfirmLink: emailConfirmLink,
+                            password: req.body.password,
+                            registrationDate: Date.now(),
+                            role: req.body.role,
+                            isParticipant: isParticipant,
+                            favourites: [],
+                        })
+                        console.log(newUser)
+                        // СОХРАНЯЕМ НОВОГО ПОЛЬЗОВАТЕЛЯ В BD 
+                        User.addUser(newUser, (err, user) => {
+                            if (err)
+                                res.json({ success: false, msg: 'Новый пользователь не был добавлен' })
 
-                    email: email,
-                    isConfirmed: false,
-                    password: req.body.password,
-                    registrationDate: Date.now(),
-                    role: req.body.role,
-                    isParticipant: isParticipant,
-                    favourites: [],
+                            mailer.registrationEmailConfirmation(user.email, user._id)
+                            console.log(user)
+
+                            res.json({ success: true, msg: 'Новый пользователь был добавлен!' })
+                        })
+                    })
                 })
-                console.log(newUser)
-                // СОХРАНЯЕМ НОВОГО ПОЛЬЗОВАТЕЛЯ В BD 
-                User.addUser(newUser, (err, user) => {
-                    if (err)
-                        res.json({ success: false, msg: 'Новый пользователь не был добавлен' })
-
-                    mailer.registrationEmailConfirmation(user.email, user._id)
-                    console.log(user)
-
-                    res.json({ success: true, msg: 'Новый пользователь был добавлен!' })
-
-                })
-            })
+            })    
         }
-
     })
-
 });
 
 router.post('/confirmEmail', (req, res) => {
 
-
     let confirmLink = req.body.confirmLink
-    console.log('Конфирмейшнлинк, ну или айди: ' + confirmLink)
-    if (confirmLink.length != 24) {
-        return res.json({ success: false, msg: 'ссылка подтверждения невалидна' })
-
-    }
-    User.getUserById(confirmLink, (err, user) => {
+    console.log('Конфирмейшнлинк: ' + confirmLink)
+  
+    User.emailConfirmation(confirmLink, (err, user) => {
         if (err) throw err
-        if (!user)
-            return res.json({ success: false, msg: 'такой email не зарегестрирован или ссылка подтверждения невалидна' })
+        if (user.n == 0) return res.json({ success: false, msg: 'такой email не зарегестрирован или ссылка подтверждения невалидна' })
+        
+        res.json({ success: true, msg: 'ваша электронная почта подтверждена' })
 
-        if (user.isConfirmed === true) {
-            console.log('user with email: ' + user.email + ' is already confirmed')
-            return res.json({ success: false, msg: 'этот email уже подтвержден' })
-        }
-        if (user && user.isConfirmed === false) {
-
-            User.isConfirmedTrue(confirmLink, (err, newValue) => {
-                if (err) throw err
-                if (!newValue)
-                    return res.send({ success: false, msg: 'не удалось подтвердить email' })
-                res.send({ success: true, msg: 'ваша электронная почта подтверждена' })
-
-            })
-        }
     })
+        
+    
 })
 
 router.post('/changeEmail', passport.authenticate('jwt', { session: false }), (req, res) => {
@@ -143,48 +124,62 @@ router.post('/changeEmail', passport.authenticate('jwt', { session: false }), (r
     var token = getToken(req.headers);
     if (token) {
 
-        let oldEmail = req.body.oldEmail
+        let password = req.body.password
         let newEmail = req.body.newEmail
         let id = req.body.id
 
         idDebugger(id, (isValid) => {
 
-            if (!isValid)
-                return res.json({ success: false, msg: 'id isNotValid' })
+            if (!isValid) return res.json({ success: false, msg: 'id isNotValid' })
 
+            console.log(id, password, newEmail)
 
-            console.log(id, oldEmail, newEmail)
-
-            // ПРОВЕРЯЕМ АУТЕНТИЧНОСТЬ EMAIL
-            User.getUserByEmail(req.body.newEmail, (err, user) => {
+            User.getUserById(id, (err, user) => {
                 if (err) throw err
-                if (user)
-                    return res.json({ success: false, msg: 'Пользователь с таким email уже существует' })
+                if (!user) return res.json({ success: false, msg: 'invalid id' })
+    
+                User.comparePass(password, user.password, (err, isMatch) => {
+                    if (err) throw err
+                    if (isMatch) {
 
-                ///////////////////
-                // Проверяем isParticipant 
-                Emails.getEmails((err, emails) => {
-                    if (err)
-                        res.json({ success: false, msg: 'Ошибка в бд' })
-                    let emailArr = emails[0].emails
-                    let isParticipant = false
-                    if (emailArr.includes(newEmail))
-                        isParticipant = true
-
-                    User.changeEmail(id, newEmail, isParticipant, (err, response) => {
+                    // ПРОВЕРЯЕМ АУТЕНТИЧНОСТЬ EMAIL
+                    User.getUserByEmail(req.body.newEmail, (err, user) => {
                         if (err) throw err
-                        if (!response || response.n === 0) {
-                            console.log(response)
-                            return res.json({ success: false, msg: 'smth got absolutely wrong' })
-                        }
+                        if (user) return res.json({ success: false, msg: 'Пользователь с таким email уже существует' })
 
-                        mailer.registrationEmailConfirmation(newEmail, id)
-                        return res.json({ success: true, msg: 'email изменен', email: newEmail, isParticipant: isParticipant })
+                        // Проверяем isParticipant 
+                        Emails.getEmails((err, emails) => {
+                            if (err) res.json({ success: false, msg: 'Ошибка в бд' })
+                            let emailArr = emails[0].emails
+                            let isParticipant = false
+                            if (emailArr.includes(newEmail)) isParticipant = true
 
+                            bcrypt.genSalt(10, (err, salt) => {
+                                bcrypt.hash(email, salt, (err, hash) => {
+                                    if (err) throw err
+                                    // passlink creation process
+                                    let emailConfirmLink = hash
+                                    emailConfirmLink = emailConfirmLink.split('.').join('').split('/').join('')
 
+                                    User.changeEmail(id, newEmail, isParticipant, emailConfirmLink, (err, response) => {
+                                        if (err) throw err
+                                        if (!response || response.n === 0) {
+                                            console.log(response)
+                                            return res.json({ success: false, msg: 'smth got absolutely wrong' })
+                                        }
+                                    // mailer.registrationEmailConfirmation(newEmail, id)
+                                        return res.json({ success: true, msg: 'email изменен', email: newEmail, isParticipant: isParticipant })
+
+                                    })
+                                })
+                            })
+                        })
                     })
-                })
+                } else {
+                    return res.json({ success: false, reason: "invalid password", msg: 'Неверный пароль' })
+                }
             })
+            })        
         })
     } else {
         return res.status(403).send({ success: false, msg: 'Unauthorized.' });
@@ -196,10 +191,12 @@ router.post('/changePassword', passport.authenticate('jwt', { session: false }),
     var token = getToken(req.headers);
     if (token) {
 
-        let id = req.body.user.id
-        if (id.length !== 24) return res.json({ success: false, msg: 'invalid id' })
-        let oldPass = req.body.user.oldPass
-        let newPass = req.body.user.newPass
+        let id = req.body.id
+        idDebugger(id, (isValid) => {
+            if (!isValid) return res.json({ success: false, msg: 'id isNotValid' })
+
+        let newPass = req.body.newPass
+        let oldPass = req.body.oldPass
 
         User.getUserById(id, (err, user) => {
             if (err) throw err
@@ -223,6 +220,7 @@ router.post('/changePassword', passport.authenticate('jwt', { session: false }),
                 }
             })
         })
+    })
     } else {
         return res.status(403).send({ success: false, msg: 'Unauthorized.' });
     }
@@ -237,7 +235,7 @@ router.post('/authentification', (req, res) => {
     User.getUserByEmail(email, (err, user) => {
         if (err) throw err
         if (!user)
-            return res.json({ success: false, reason: "invalid email", msg: 'Пользователь с таким email не был найден' })
+            return res.json({ success: false, reason: "invalid email", msg: 'email' })
 
         User.comparePass(password, user.password, (err, isMatch) => {
             if (err) throw err
@@ -247,7 +245,7 @@ router.post('/authentification', (req, res) => {
                 return res.json({ success: true, token: 'JWT ' + token, user: user });
 
             } else {
-                return res.json({ success: false, reason: "invalid password", msg: 'Неверный пароль' })
+                return res.json({ success: false, reason: "invalid password", msg: 'password' })
             }
         })
     })
@@ -259,62 +257,87 @@ router.post('/createNewPassLink', (req, res) => {
     User.getUserByEmail(email, (err, user) => {
         if (err) throw err
         if (!user) {
-            return res.json({ success: false, msg: 'Пользователь с таким email не был найден' })
+            return res.json({ success: false, msg: 'email' })
         }
         else {
+            let idString = `${user._id}`.slice(20, 24)
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(idString, salt, (err, hash) => {
+                    if (err) throw err
 
-            let newPassLink = user._id
+                    // passlink creation process
+                    let newPassLink = hash
+                    console.log('newPassLink')
+                    newPassLink = newPassLink.split('.').join('').split('/').join('')
 
-            User.changingPassProcess(user._id, newPassLink, (err, result) => {
-                if (err) throw err
-                if (!result) {
-                    return res.json({ success: false, msg: 'Не знаю, что пошло не так' })
-                }
-                else {
-                    console.log(newPassLink)
-                    mailer.newPassLink(user, newPassLink)
-                }
+                    User.changingPassProcess(user._id, newPassLink, (err, result) => {
+                        if (err) throw err
+                        if (!result) {
+                            return res.json({ success: false, msg: 'otherReason' })
+                        }
+                        else {
+                            console.log(newPassLink)
+                            mailer.newPassLink(user, newPassLink)
+                        }
+                    })
+
+                    return res.json({ success: true, msg: 'письмо с инструкцией по восстановлению пароля отправлено на вашу почту' })
+                })
             })
-
-
-            return res.json({ success: true, msg: 'письмо с инструкцией по восстановлению пароля отправлено на вашу почту' })
         }
     })
 
     //
 })
 
-router.post('/passConfirmLinkCheck', (req, res) => {
-    const confirmLink = req.body.confirmLink
-    console.log(confirmLink)
-    User.changingPassCheck(confirmLink, (err, user) => {
+router.post('/passLinkCheck', (req, res) => {
+    const passLink = req.body.passLink
+    console.log(passLink)
+    User.changingPassCheck(passLink, (err, user) => {
         if (err) throw err
         if (!user) {
-            // || user.n === 0
-            return res.json({ success: false, msg: 'confirmLink not valid' })
+            return res.json({ success: false, msg: 'passLink not valid' })
         }
-
-        return res.json({ success: true, msg: 'confirmLink valid, придумайте новый пароль' })
-
+        return res.json({ success: true, msg: 'passLink is valid, придумайте новый пароль' })
     })
-
-    //
 })
 
 router.post('/newPassSave', (req, res) => {
-    const confirmLink = req.body.confirmLink
+    const passLink = req.body.passLink
     const newPass = req.body.newPass
-    console.log(confirmLink, newPass)
-    User.newPassSave(confirmLink, newPass, (err, newValue) => {
+    console.log(passLink, newPass)
+    User.newPassSave(passLink, newPass, (err, newValue) => {
         if (err) throw err
-
         console.log(newValue)
         res.json({ success: true, msg: "пароль обновлен" })
-
     })
-
 })
 
+router.post('/changeRole', passport.authenticate('jwt', { session: false }), (req, res) => {
+    console.log('i was used')
+    var token = getToken(req.headers);
+    if (token) {
+        let changeRole = req.body.changeRole
+        console.log(changeRole)
+
+        idDebugger(changeRole.id, (isValid) => {
+
+            if (!isValid) return res.json({ success: false, msg: 'id isNotValid' })
+
+            User.changeRole(changeRole.id, changeRole.role, (err, response) => {
+                if (err) throw err
+                if (!response)
+                    return res.json({ success: false, msg: 'какие-то проблемы' })
+                else {
+                    console.log(response)
+                    res.json({ success: true, msg: 'вроде role апдейтед' })
+                }
+            });
+        })
+    } else {
+        return res.status(403).send({ success: false, msg: 'Unauthorized.' });
+    }
+})
 
 
 

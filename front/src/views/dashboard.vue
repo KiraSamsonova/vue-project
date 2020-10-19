@@ -13,13 +13,13 @@
       <div>
         <profiles />
       </div>
-      <newProfile />
+      <!-- <newProfile /> -->
     </div>
   </div>
 </template>
 
 <script>
-import newProfile from '@/views/newProfile'
+// import newProfile from '@/views/newProfile'
 import Profiles from '@/views/profiles'
 import personalData from '@/views/personalData'
 import favBloggers from '@/views/favBloggers'

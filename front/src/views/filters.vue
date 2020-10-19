@@ -1,9 +1,9 @@
 <template>
-  <div class="test">
+  <div>
 
     <div class="mobile-button-wrapper" 
         v-bind:class="{'mobile-button-moved':filtersActive}"
-        v-on:click="filtersActive=!filtersActive">
+        v-on:click="toggleFilters()">
 
         <svg version="1.1" class="mobile-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
           viewBox="0 0 12 11" style="enable-background:new 0 0 12 11;" xml:space="preserve">
@@ -41,13 +41,15 @@
 
           <h3 class="filters__title">Параметры поиска</h3>
 
-          <form class="filters__form form" @submit.prevent="filtersSubmit()">
+          <form class="filters__form form" v-on:change="filtersSubmit()">
 
             <section class="section section_first">
 
               <label for="country" class="label">Страна аудитории:</label>
 
-              <select name="country" class="select select_country" id='country' v-model="country">
+              <select name="country" id='country'
+                v-model="country" class="select select_country" 
+                v-bind:class="{select__fontBlack:country !== ''}">
                 <option value="" class="select__placeholder"><span class="select__placeholder">Выберите страну</span> </option>
                 <option v-for="country in allCountries"
                 :key="country" :value="country" class="select__option">
@@ -62,7 +64,8 @@
               <select name="city" id='city' class="select select_disabled" 
               v-if="!allCities[country]" disabled></select>
 
-              <select v-else name="city" id='city' class="select" v-model="city">
+              <select v-else name="city" id='city' 
+                class="select" v-bind:class="{select__fontBlack:city !== ''}" v-model="city">
                 <option value="" class="select__placeholder">Выберите город</option>
                 <option v-for="town in allCities[country]" :key="town" :value="town" class="select__option">
                   {{town}}
@@ -77,18 +80,18 @@
 
               <div class="section__range-wraper"
                 v-bind:style="{'--a': ageMin, '--b': ageMax}">
-                 <input type="range" min="1" max="7" list="num" id='age' 
-                 v-model="ageMin" v-on:change="ageMin > ageMax ? ageMin = ageMax : ageMin = ageMin; inputRange() " />
+                 <input type="range" min="1" max="8" list="num" id='age' 
+                 v-model="ageMin" v-on:change="ageMin >= ageMax - +1 ? ageMin = ageMax - +1 : ageMin = ageMin; inputRange() " />
 
-                 <input type="range" min="1" max="7" list="num"
-                  v-model="ageMax" v-on:change="ageMax < ageMin ? ageMax = ageMin : ageMax = ageMax; inputRange() "/>
+                 <input type="range" min="1" max="8" list="num"
+                  v-model="ageMax" v-on:change="ageMax < ageMin + +1 ? ageMax = ageMin + +1 : ageMax = ageMax; inputRange() " />
 
               </div>
               
               <datalist id="num" class="section__datalist" >
 
                 <option v-for="age in allAgeCat" :key="age"
-                  :label="age" class="section__datalist-option" v-bind:class="{'section__datalist-option-grey-font': !subscribersAge.includes(age)}">
+                  :label="age" class="section__datalist-option" v-bind:class="{'section__datalist-option-grey-font': !chosenOptionsAges.includes(age)}">
                 </option>
 
               </datalist> 
@@ -121,52 +124,38 @@
 
             </section>
 
-            <section class="section">
+            <section class="section themes">
 
-              <label for="all-themes" class="label">Тематика:</label>
+              <p class="label">Тематика:</p>
 
-              <select name="all-themes" class="select" id='all-themes' 
-              v-on:click="showThemes = true">
-                
-                <option value="" class="select__placeholder">
-                  <span class="select__placeholder">Выберите тематику</span> 
-                </option>
+              <div class="themes__list" v-if="themes.length !== 0">
 
-              </select>
+                <div class="themes__list-single"
+                v-for="theme in themes" :key="theme">
 
-              <div class="select__themes-wrapper" v-if="showThemes">
-                <div class="select__themes-container">
-                  <button class="select__themes-close-btn" v-on:click="showThemes = false">
+                  <span class="themes__list-text">
+                    {{theme.slice(0, theme.length-1) }}<span class="themes__last-letter">{{theme.slice(theme.length-1) }}
 
-                    <svg version="1.1" class="select__themes-close-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                      viewBox="0 0 7 7" style="enable-background:new 0 0 7 7;" xml:space="preserve">
 
-                      <path class="st0" style="fill:#444444" d="M4.2,3.5l2.6-2.6C7,0.7,7,0.3,6.9,0.1S6.3,0,6.1,0.1L3.5,2.8L0.9,0.1C0.7,0,0.3,0,0.1,0.1S0,0.7,0.1,0.9
-                        l2.6,2.6L0.1,6.1C0,6.3,0,6.7,0.1,6.9C0.2,7,0.4,7,0.5,7s0.3,0,0.4-0.1l2.6-2.6l2.6,2.6C6.2,7,6.4,7,6.5,7s0.3,0,0.4-0.1
-                        C7,6.7,7,6.3,6.9,6.1L4.2,3.5z"/>
-                    </svg>
+                      <span class="themes__list-number">{{getAllThemes[theme]}}23</span>
 
-                  </button>
+                    </span> 
+                    
+                  </span>
 
-                  <label v-for="theme in allThemes" :key="theme" :for="theme" class="checkbox checkbox__label">
-                    <span class="checkbox__text">{{theme}}</span>
-                    <input type="checkbox" v-model="themes" :id="theme" :value="theme">
-                    <span v-if="!themes.includes(theme)" class="checkbox__span"></span>
+                </div>  
 
-                    <svg v-else version="1.1" class="checkbox__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-                        viewBox="0 0 6 6" style="enable-background:new 0 0 6 6;" xml:space="preserve">
-                        <path d="M6,0.5C6,0.5,6,0.4,6,0.5c0-0.1,0-0.2,0-0.2c0,0,0-0.1,0-0.1c0,0,0-0.1-0.1-0.1c0,0,0,0,0-0.1c0,0,0,0,0,0c0,0,0,0,0,0
-                          c0,0,0,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0,0,0-0.1,0.1c0,0,0,0-0.1,0
-                          L2.4,3.7L0.9,2.1c0,0,0,0,0,0c0,0-0.1,0-0.1-0.1c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0
-                          c0,0,0,0,0,0c0,0,0,0,0,0c0,0,0,0,0,0c0,0,0,0,0,0c0,0,0,0.1-0.1,0.1c0,0,0,0.1,0,0.1c0,0,0,0.1,0,0.1c0,0,0,0.1,0,0.1
-                          c0,0,0,0.1,0,0.1c0,0,0,0.1,0,0.1c0,0,0,0,0,0L2,5.8c0,0,0,0,0,0c0,0.1,0.1,0.1,0.2,0.2c0,0,0,0,0,0C2.2,6,2.3,6,2.4,6c0,0,0,0,0,0
-                          c0,0,0,0,0,0s0,0,0,0c0,0,0,0,0,0c0.1,0,0.2,0,0.2-0.1c0,0,0,0,0,0c0.1,0,0.1-0.1,0.2-0.2c0,0,0,0,0,0l3.1-5c0,0,0,0,0-0.1
-                          C6,0.7,6,0.6,6,0.5C6,0.6,6,0.5,6,0.5z"/>
-                    </svg>
-                  </label>
-                </div>
               </div>
 
+              <button class="themes__open-btn" type="button" 
+                v-on:click="themesModalActive=!themesModalActive">
+                <span class="themes__btn-text"
+                  v-if="themes.length === 0"
+                >Выбрать
+                </span>
+
+                <span v-else class="themes__btn-text">Изменить</span>
+              </button>
 
             </section>
 
@@ -256,7 +245,31 @@
 
             <section class="section">
 
-              <p class="label label-number">Стоимость рекламных постов:</p>
+              <p class="label label-number">Вовлечение</p>
+
+              <label for="engagementMin" class="number">От:
+
+                <input type="text" name="engagementMin" id="engagementMin" 
+                v-on:input="numbersOnInput($event.target, 'engagementMin')" placeholder="0">
+
+                <span class="number__percent">%</span> 
+
+              </label>
+
+              <label for="engagementMax" class="number">До:
+
+                <input type="text" name="engagementMax" id="engagementMax"
+                  v-on:input="numbersOnInput($event.target, 'engagementMax')" placeholder="0">
+
+                <span class="number__percent">%</span> 
+
+              </label>
+
+            </section>
+
+            <section class="section">
+
+              <p class="label label-number">Стоимость <br> рекламных постов:</p>
 
               <label for="postPriceMin" class="number">От:
 
@@ -280,7 +293,7 @@
 
             <section class="section">
 
-              <p class="label label-number">Стоимость рекламных сторис:</p>
+              <p class="label label-number">Стоимость <br> рекламных сторис:</p>
 
               <label for="storyPriceMin" class="number">От:
 
@@ -331,7 +344,7 @@
             <section class="section section_last">
 
               <div class="checkbox checkbox_single">
-                <label for="isParticipant" class="checkbox__label">
+                <label for="isCoopReady" class="checkbox__label">
                   <span class="checkbox__text-long">
                     Готовность <br> К взаимопостингу
                   </span>
@@ -355,162 +368,168 @@
             </section>
 
           </form>
-              <!-- <div class="allThemes" v-for="theme in allThemes" :key="theme">{{theme}}</div> -->
-
-
-          
-          <!-- <form @submit.prevent="filtersSubmit()" class="filters__filters-form">
-              <h3>Выбор темы</h3>
-              <br />
-
-              <div class="allThemesHundler">
-                <section class="allThemes" v-for="theme in allThemes" :key="theme">
-                  <input
-                    type="checkbox"
-                    name="theme"
-                    class="themeInput"
-                    v-model="themes"
-                    :id="theme"
-                    :value="theme"
-                  />
-                  <label :for="theme">{{theme}}</label>
-                </section>
-              </div>
-
-              <p>country</p>
-              <select name="country" v-model="country">
-                <option v-for="country in allCountries" :key="country" :value="country">{{country}}</option>
-              </select>
-              <br />
-
-              <p v-if="allCities[country]">city</p>
-              <select name="city" v-model="city" v-if="allCities[country]">
-                <option v-for="town in allCities[country]" :key="town" :value="town">{{town}}</option>
-              </select>
-              <br />
-
-              <p v-if="allGenderCat">SubscribersGender</p>
-              <select
-                name="SubscribersGender"
-                id="SubscribersGender"
-                v-model="SubscribersGender"
-                v-if="allGenderCat"
-              >
-                <option v-for="gender in allGenderCat" :key="gender" :value="gender">{{gender}}</option>
-              </select>
-
-              <p v-if="allAgeCat">subscribersAge</p>
-              <select name="subscribersAge" id="subscribersAge" v-model="subscribersAge" v-if="allAgeCat">
-                <option v-for="age in allAgeCat" :key="age" :value="age">{{age}}</option>
-              </select>
-
-              <div>
-                <p>Подписчики: от - до (целые числа от 0)</p>
-                <input type="number" name id v-model="sbcMin" />-
-                <input type="number" name id v-model="sbcMax" />
-              </div>
-              <div>
-                <p>Охваты постов: от - до (целые числа от 0)</p>
-                <input type="number" name id v-model="postRangeMin" />-
-                <input type="number" name id v-model="postRangeMax" />
-              </div>
-
-              <div>
-                <p>Охваты сторис: от - до (целые числа от 0)</p>
-                <input type="number" name id v-model="storyRangeMin" />-
-                <input type="number" name id v-model="storyRangeMax" />
-              </div>
-
-              <div>
-                <p>Стоимость рекламных постов: от - до (целые числа от 0) и значок рубля</p>
-                <input type="number" name id v-model="postPriceMin" />-
-                <input type="number" name id v-model="postPriceMax" />
-              </div>
-
-              <div>
-                <p>Стоимость рекламных сторис: от - до (целые числа от 0) и значок рубля</p>
-                <input type="number" name id v-model="storyPriceMin" />-
-                <input type="number" name id v-model="storyPriceMax" />
-              </div>
-
-              <div>
-                <p>Участник клуба рокстар (галочка)</p>
-                <input type="checkbox" name id v-model="isParticipant" />
-              </div>
-              <div>
-                <p>Готовность к взаимпиару (галочка)</p>
-                <input type="checkbox" name id v-model="isCoopReady" />
-              </div>
-
-              <button type="submit">кнопка</button>
-          </form> -->
 
         </div>
       </div>
 
+    </div>
 
+    <div class="themes__modal" v-if="themesModalActive">
 
+      <button class="themes__close-btn" v-on:click="themesModalActive=!themesModalActive">
+
+        <svg version="1.1" class="themes__close-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          viewBox="0 0 7 7" style="enable-background:new 0 0 7 7;" xml:space="preserve">
+
+          <path class="st0" style="fill:#444444" d="M4.2,3.5l2.6-2.6C7,0.7,7,0.3,6.9,0.1S6.3,0,6.1,0.1L3.5,2.8L0.9,0.1C0.7,0,0.3,0,0.1,0.1S0,0.7,0.1,0.9
+            l2.6,2.6L0.1,6.1C0,6.3,0,6.7,0.1,6.9C0.2,7,0.4,7,0.5,7s0.3,0,0.4-0.1l2.6-2.6l2.6,2.6C6.2,7,6.4,7,6.5,7s0.3,0,0.4-0.1
+            C7,6.7,7,6.3,6.9,6.1L4.2,3.5z"/>
+        </svg>
+
+      </button>
+
+      <div class="themes__container">
+
+        <h5 class="label">Тематика:</h5>
+
+          <div class="themes__content">
+
+            <label v-for="(themeNumber, themeName) in getAllThemes" :key="themeName" :for="themeName" 
+              class="checkbox checkbox-themes checkbox__label"
+              v-on:click="createThemesListMargin()">
+
+              <span class="checkbox__text" v-bind:class="{checkbox__textDark: themes.includes(themeName)}">{{themeName}}</span>
+              
+              <input type="checkbox" v-model="themes" :id="themeName" :value="themeName">
+
+              <span v-if="!themes.includes(themeName)" class="checkbox__span"></span>
+
+              <svg v-else version="1.1" class="checkbox__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                viewBox="0 0 6 6" style="enable-background:new 0 0 6 6;" xml:space="preserve">
+                            <path d="M6,0.5C6,0.5,6,0.4,6,0.5c0-0.1,0-0.2,0-0.2c0,0,0-0.1,0-0.1c0,0,0-0.1-0.1-0.1c0,0,0,0,0-0.1c0,0,0,0,0,0c0,0,0,0,0,0
+                              c0,0,0,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0,0,0-0.1,0.1c0,0,0,0-0.1,0
+                              L2.4,3.7L0.9,2.1c0,0,0,0,0,0c0,0-0.1,0-0.1-0.1c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0c0,0-0.1,0-0.1,0
+                              c0,0,0,0,0,0c0,0,0,0,0,0c0,0,0,0,0,0c0,0,0,0,0,0c0,0,0,0.1-0.1,0.1c0,0,0,0.1,0,0.1c0,0,0,0.1,0,0.1c0,0,0,0.1,0,0.1
+                              c0,0,0,0.1,0,0.1c0,0,0,0.1,0,0.1c0,0,0,0,0,0L2,5.8c0,0,0,0,0,0c0,0.1,0.1,0.1,0.2,0.2c0,0,0,0,0,0C2.2,6,2.3,6,2.4,6c0,0,0,0,0,0
+                              c0,0,0,0,0,0s0,0,0,0c0,0,0,0,0,0c0.1,0,0.2,0,0.2-0.1c0,0,0,0,0,0c0.1,0,0.1-0.1,0.2-0.2c0,0,0,0,0,0l3.1-5c0,0,0,0,0-0.1
+                              C6,0.7,6,0.6,6,0.5C6,0.6,6,0.5,6,0.5z"/>
+              </svg>
+
+            </label>
+
+          </div>
+
+        <button class="themes__btn-ready" v-on:click="themesSubmit()">
+          <span class="themes__btn-ready-text">Готово</span> 
+        </button>            
+      </div>
 
     </div>
 
-    <div class="fullscreenShadow" v-bind:class="{fullscreenShadowActive:filtersActive}" v-on:click="filtersActive=!filtersActive"></div>
+    <div class="fullscreenShadow"
+      v-bind:class="{fullscreenShadowActive:filtersActive}"
+      v-on:click="toggleFilters()">
+    </div>
+
+    <div class="fullscreenShadow"
+     v-bind:class="{themesFullscreenShadowActive:themesModalActive}"
+      v-on:click="themesModalActive=!themesModalActive">
+    </div>
+
 
   </div>
 </template>
 
 <script>
   import {mapGetters,mapActions} from 'vuex'
+  import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
   export default {
     name: 'filters',
 
     data() {
       return {
-        showThemes: false,
+        themesModalActive: false,
         ageMin: 2,
-        ageMax: 6,
+        ageMax: 8,
+        chosenOptionsAges: [],
         filtersActive: false,
         themes: [],
         country: '',
         city: '',
         subscribersAge: [],
         SubscribersGender: ['Любой'],
-        sbcMin: 100,
+        sbcMin: null,
         sbcMax: null,
         postRangeMin : null,
         postRangeMax : null,
         storyRangeMin : null,
         storyRangeMax : null,
+        engagementMin: null,
+        engagementMax: null,
         postPriceMin: null,
         postPriceMax : null,
-        storyPriceMin: 1000,
+        storyPriceMin: null,
         storyPriceMax: null,
-
         isParticipant: false,
         isCoopReady: false,
-
       }
     },
     computed: 
-    mapGetters(["allThemes", "allCountries", "allCities","allAgeCat","allGenderCat",]),
+    mapGetters(["allThemes", "allCountries", "allCities","allAgeCat","allGenderCat","getAllThemes"]),
 
     mounted() {
-     this.inputRange()
+      this.inputRange()
+      this.createThemesListMargin()
+      this.axiosGetAllThemes() 
+      this.hasIdParam()
+      
     },
 
 
     methods: {
-      ...mapActions(["fetchAllBloggers"],),
+      ...mapActions(["fetchAllBloggers",'axiosBloggerById', "axiosGetAllThemes"]),
+ 
+      hasIdParam() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id')
+        if(id !== null) {
+          this.axiosBloggerById(id)
+        } else {
+          this.filtersSubmit()
+        }
+      },
+
+      createThemesListMargin () {
+        let texts = document.getElementsByClassName('themes__list-text')
+        let numbers = document.getElementsByClassName('themes__list-number')
+        for (let i = 0; i < texts.length; i++) {
+          texts[i].style.marginRight = `${numbers[i].offsetWidth + 8}px`
+        }
+      },
+
+      toggleFilters() {
+        this.filtersActive = !this.filtersActive;
+
+        if(this.filtersActive) disableBodyScroll(document.getElementsByTagName('body'))
+
+        else enableBodyScroll(document.getElementsByTagName('body'))
+      },
+
+      themesSubmit() {
+        this.themesModalActive=false
+        this.filtersSubmit()
+      },
 
       numbersOnInput(target, model) {
         let strVal = target.value.split(',').join('')
         let numVal = +target.value.split(',').join('')
 
         if (numVal +1 -1 !== numVal) {
-          console.log('not number')
+          
           return target.value = new Intl.NumberFormat('en-US').format(+strVal.slice(0, strVal.length - 1))
         }
         else {
-          console.log(true)
+        
           this[model] = numVal
           target.value = new Intl.NumberFormat('en-US').format(numVal)
         }
@@ -520,67 +539,61 @@
       },
 
       inputRange(){
+        this.chosenOptionsAges = []
         this.subscribersAge = []
         for(let a = this.ageMin; a <= this.ageMax; a++) {
 
-          this.subscribersAge.push(this.allAgeCat[a-1])
+          this.chosenOptionsAges.push(this.allAgeCat[a-1])
         }
-        console.log(this.subscribersAge)
+        
+        for(let i = 0; i < this.chosenOptionsAges.length - +1; i++) {
+          this.subscribersAge.push(this.chosenOptionsAges[i] + '-' + this.chosenOptionsAges[i+1])
+        }
+        
+        
 
       },
 
-
       filtersSubmit() {
-        this.subscribersAge = []
-        for(let a = this.ageMin; a <= this.ageMax; a++) {
-          this.subscribersAge.push(this.allAgeCat[a-1])
-        }
-        console.log(subscribersAge)
 
+        if(window.location.search !== '') {
+          history.pushState({param: 'Value'}, '', 'home');
+        }
+
+        // Составляем объект с данными фильтров
         let filtersValue = {
-          themes: { $all: this.themes } ,
+          themes: this.themes,
           country: this.country,
           city: this.city,
-          // Age неверен!!
-          // subscribersAge: this.subscribersAge,
+          subscribersAge: this.subscribersAge,
           SubscribersGender: this.SubscribersGender,
-          subscribersNumber: {$gte: this.sbcMin, $lte: this.sbcMax},
-          AveragePost: {$gte: this.postRangeMin  , $lte: this.postRangeMax },
-          AverageStory: {$gte: this.storyRangeMin  , $lte: this.storyRangeMax },
-
-          postPrice: {$gte: this.postPriceMin  , $lte: this.postPriceMax},
-
-          storyPrice:{$gte: this.storyPriceMin  , $lte: this.storyPriceMax },
+          sbcMin: this.sbcMin,
+          sbcMax: this.sbcMax,
+          postRangeMin: this.postRangeMin,
+          postRangeMax: this.postRangeMax,
+          storyRangeMin: this.storyRangeMin,
+          storyRangeMax: this.storyRangeMax,
+          engagementMin: this.engagementMin,
+          engagementMax: this.engagementMax,
+          postPriceMin: this.postPriceMin,
+          postPriceMax: this.postPriceMax,
+          storyPriceMin: this.storyPriceMin,
+          storyPriceMax: this.storyPriceMax,
 
           isParticipant: this.isParticipant,
           isCoopReady: this.isCoopReady,
         };
 
-  if( filtersValue.city && !this.allCities[this.country] || filtersValue.city == '') delete filtersValue.city
+        // Обрабатываем данные по странам и городам
+        if( filtersValue.city && !this.allCities[this.country]) delete filtersValue.city
 
-  for (var elem in filtersValue) {
-  let gg = filtersValue[elem]
 
-    if (gg == '')  delete filtersValue[elem] 
+         this.fetchAllBloggers(filtersValue)
 
-    if (gg.$lte === null || gg.$lte == '') delete gg.$lte 
-
-  if (gg.$gte === null || gg.$gte == '') delete gg.$gte
-
-  if (gg === false) delete delete filtersValue[elem] 
-
-  if ( typeof filtersValue[elem] === "object" && Object.keys(filtersValue[elem]).length === 0) delete filtersValue[elem] 
-
-  }
-  if (this.themes.length === 0) delete filtersValue.themes
-
-  //|| Object.keys(elem).length === 0  || elem == null
-  this.fetchAllBloggers(filtersValue)
-
-  console.log(filtersValue)
-    filtersValue = {}
+        console.log(filtersValue)
+        filtersValue = {}
       },
-  }
+    }
 
   }
 </script>
@@ -594,6 +607,21 @@
     }
   }
 
+  @mixin Breakpoint750 {
+    @media (max-width: 750px) {
+       @content;
+    }
+  }
+  @mixin Breakpoint480 {
+    @media (max-width: 480px) {
+       @content;
+    }
+  }
+
+  * {
+    font-family: "Roboto-regular";
+    font-size: 13px;
+  }
   .divider {
 
     margin: 0px 0px -16px -192px;
@@ -661,7 +689,7 @@
       right: 0px;
       -webkit-transition: all 0.5s ease 0s;
       transition: all 0.5s ease 0s;
-      z-index: 100;
+      z-index: 70;
       position: fixed;
     }
 
@@ -680,7 +708,8 @@
 
     width: 26px;
     height: 24px;
-    border-radius: 3px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
     box-shadow: 1.5px 2.598px 3px rgba(0,0,0,0.15);
     background-color: white;
     -webkit-transition: all 0.5s ease 0s;
@@ -688,7 +717,7 @@
 
   }
   .mobile-svg {
-    z-index: 100;
+    z-index: 70;
     margin: 7px 7px 7px 8px;
     fill: grey
   }
@@ -697,7 +726,7 @@
     -webkit-transition: all 0.5s ease 0s;
     transition: all 0.5s ease 0s;
     position: fixed;
-    z-index: 100;
+    z-index: 70;
   }
   .fullscreenShadow {
     display: none;
@@ -711,10 +740,15 @@
   } 
   .fullscreenShadowActive {
     display: block;
-    opacity: 80%;
+    opacity: 0.8;
     z-index: 40;
   }
-  //
+
+  .themesFullscreenShadowActive {
+    display: block;
+    opacity: 0.8;
+    z-index: 70;
+  }
 
   .section {
     margin-top: 35px;
@@ -750,9 +784,9 @@
         z-index: 2;
         overflow: hidden;
 
-        margin-left: calc(16px + (var(--a) - 1)/6*156px);
+        margin-left: calc(16px + (var(--a) - 1)/7*156px);
 
-        width: calc((var(--b) - var(--a))/6*156px - 16px);
+        width: calc((var(--b) - var(--a))/7*156px - 16px);
       }
     }
 
@@ -803,7 +837,7 @@
         cursor: pointer;
         margin-top: -15px; 
         overflow: hidden;
-        z-index: 100;
+        z-index: 70;
         pointer-events: auto;
       }
       &::-moz-range-thumb {
@@ -902,6 +936,10 @@
       }
     }
 
+    &__percent {
+      min-width: 9px;
+      font-family: 'Roboto-bold';
+    }
     &__rubble {
       min-width: 9px;
     }
@@ -924,6 +962,10 @@
     font-size: 13px;
     cursor: pointer;
     color: #d6d6d6; 
+
+    :nth-child(1) {
+      color: #d6d6d6; 
+    }
     &::-ms-expand {
 	    display: none;
       }
@@ -942,44 +984,10 @@
       background-color: #d6d6d6;
       background-image: none
     }
-
-
-    &__themes-wrapper {
-      white-space: nowrap;
-      overflow: visible;
-      position: absolute;
-      top: 50px;
-      left: 0px;
-
-      z-index: 100;
-      background-color: #fff;
-      width: 400px;
-      height: 511px;
-
+    &__fontBlack {
+      color: black;
     }
 
-    &__themes-container {
-      z-index: 100;
-      width: 400px;
-      height: 511px;
-      // background-color: #fff;
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-      position: relative;
-
-    }
-
-    &__themes-close-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-    }
-
-    &__themes-close-svg {
-      width: 8px;
-      height: 8px;
-    }
   }
 
   .checkbox {
@@ -1017,6 +1025,10 @@
       font-family: "Roboto-regular"
     }
     
+    &__textDark {
+      color: black !important;
+    }
+
     & input[type='checkbox'] {
       position: absolute;
       opacity: 0;
@@ -1043,6 +1055,164 @@
       background-color: #d6d6d6;
       border-radius: 3px;
     }
+
+    &-themes {
+      height: unset;
+      margin-top: 7.5px;
+
+      & .checkbox__span {
+        width: 12px;
+        height: 12px;
+      }
+
+      & .checkbox__text {
+        color: #7c7c7c;
+      }
+      & .checkbox__svg {
+        background-color: #f8d247;
+      }
+    }
   }
+
+  .themes {
+    &__open-btn {
+      width: 62px;
+      height: 21px;
+      border-radius: 3px;
+      background-color: #969696;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 10px;
+
+      &:hover {
+        background-color: black;
+      }
+    }
+
+    &__btn-text {
+      font-family: "Roboto-regular";
+      color: #fff;
+      text-align: center;
+      font-size: 11px;
+    }
+
+    &__list {
+      margin-top: 10px;
+    }
+
+    &__list-single {
+      display: inline-block;
+    }
+
+    &__list-text {
+      text-decoration: underline;
+      display: inline-block;
+      line-height: 21px;
+    }
+
+    &__last-letter {
+      position: relative;
+    }
+
+    &__list-number {
+      position: absolute;
+      top:-5px;
+      left: 100%;
+      font-size: 8px;
+    }
+
+    &__modal {
+      font-family: "Roboto-regular";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      margin-top: -241px; 
+      margin-left: -326px; 
+      z-index: 80;
+      width: 652px;
+      height: 482px;
+      border-radius: 4px;
+      overflow: hidden;
+      background-color: #ffffff;
+
+      @include Breakpoint750 {
+        width: 444px;
+        margin-left: -222px;
+        height: unset;
+        margin-top: -206px; 
+        max-height: 100%;
+        overflow-y: auto;
+        bottom: 40px;
+      }
+
+      @include Breakpoint480 {
+        width: 234px;
+        margin-left: -117px;
+        height: unset;
+        max-height: 100%;
+        overflow-y: auto;
+        top: 40px;
+        bottom: 40px;
+        margin-top: 0px; 
+
+      }
+
+    }
+
+    &__container {
+      z-index: 80;
+      margin: 30px 25px 35px 25px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    &__close-btn {
+      position: absolute;
+      background-color: #fff;
+      top: 0px;
+      right: 0px;
+      padding: 8px 10px;
+    }
+
+    &__close-svg {
+      background-color: #fff;
+      width: 10px;
+      height: 10px;
+    }
+
+    &__content {
+      margin-top: 15px;
+      height: 325px;
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+
+      @include Breakpoint750 {
+        height: 475px;
+      }    
+
+      @include Breakpoint480 {
+        height: unset;
+      }     
+    }
+
+    &__btn-ready {
+      width: 100px;
+      height: 38px;
+      border-radius: 3px;
+      margin: 35px auto 0 auto;
+      background-color: #3f5baa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+    }
+
+    &__btn-ready-text {
+      color: #fff;
+      text-align: center;
+    }
+  } 
 
 </style>

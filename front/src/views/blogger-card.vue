@@ -51,8 +51,8 @@
             
           <div class="blogger-single__themes-wrapper" >
 
-            <p class="blogger-single__themes-single" v-for="theme in blogger.themes" :key="theme">
-              {{theme}}<span class="blogger-single__themes-margin-point-saver">•</span>
+            <p class="blogger-single__themes-single" v-for="(theme, index) in blogger.themes" :key="index">
+              {{theme}}<span v-if="index < blogger.themes.length -1" class="blogger-single__themes-margin-point-saver">•</span>
             </p>
 
           </div>
@@ -90,8 +90,7 @@
     <div class="blogger-single__column blogger-single__column_middle">
 
         <p class="blogger-single__description">
-          {{getFavArr}}
-         <!-- {{blogger.description}}  -->
+
           <span v-if='showFullDescription' class="blogger-single__full-text">
             {{longString}}
           </span>
@@ -159,7 +158,7 @@
 
             <p class="blogger-single__info-p p-info">
               <span class="p-info__regular">Вовлечение: </span>
-              <span class="p-info__bold">28.3% (доделать)</span>
+              <span class="p-info__bold">{{blogger.engagement}}%</span>
             </p>
 
         </div>
@@ -200,7 +199,6 @@
 
             <div v-if="blogger.isCoopReady === true" class="blogger-single__yes-no-img-wrapper ">
 
-              <img src="@/assets/media/yes-no-NO-non-active.svg" class="blogger-single__yes-no-img" alt="" >
               <img src="@/assets/media/yes-no-YES-active.svg" class="blogger-single__yes-no-img" alt="" >
 
             </div>
@@ -208,7 +206,7 @@
             <div v-if="blogger.isCoopReady === false" class="blogger-single__yes-no-img-wrapper">
 
               <img src="@/assets/media/yes-no-NO-active.svg" class="blogger-single__yes-no-img" alt="" >          
-              <img src="@/assets/media/yes-no-YES-non-active.svg" class="blogger-single__yes-no-img" alt="" >
+              <!-- <img src="@/assets/media/yes-no-YES-non-active.svg" class="blogger-single__yes-no-img" alt="" > -->
 
             </div>
 
@@ -373,6 +371,7 @@
     flex-direction: column;
     font-size: 13px;
     box-shadow: 0px 10px 13.5px rgba(0,0,0,0.1);
+    border-radius: 4px;
     margin-bottom: 30px;
 
     &__rockstar-wrapper {
@@ -482,6 +481,7 @@
       display: inline;
       color: #a3a3a3;
       line-height: 14px;
+
     }
 
     &__themes-margin-point-saver::before {
@@ -547,7 +547,7 @@
       position: relative;
 
       &::after {
-        margin: 0px 0px -30px 0px;
+        margin: 0px 0px -28px 0px;
         content: '';
         position: absolute;
         width:100%;
@@ -557,7 +557,7 @@
         }
 
     }
-// //
+
     &__description {
       line-height: 18px;
     }
@@ -575,7 +575,7 @@
     }
 
     .column-bottom {
-      margin-top: 57px;
+      margin-top: 54px;
       margin-bottom: 37px;
 
       @include Breakpoint750 {
@@ -656,12 +656,13 @@
     &__yes-no-img-wrapper {
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      justify-content: center;
       width: 37px;
       margin: 0 auto;
       @include Breakpoint750 {
         margin-bottom: 13px;
         margin-left: 8px;
+        justify-content: left;
       }
     }
     

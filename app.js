@@ -12,8 +12,11 @@ app.use(bodyParser.json())
 const account = require('./routes/account');
 const profiles = require('./routes/profiles');
 const bloggers = require('./routes/bloggers');
+const themes = require('./routes/themes');
 
 const Emails = require('./models/Emails')
+const Themes = require('./models/themes')
+
 
 
 const port = process.env.PORT || 8080
@@ -29,8 +32,10 @@ require('./config/passport')(passport)
 app.use(cors())
 app.use('/account', account)
 app.use('/bloggers', bloggers)
-
 app.use('/profiles', profiles)
+app.use('/themes', themes)
+
+
 //static-files
 app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));

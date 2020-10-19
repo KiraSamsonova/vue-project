@@ -1,24 +1,43 @@
+import axios from 'axios'
+
 export default {
     actions: {
-        // async  fetchPosts(ctx, limit = 3) {
-        //     const res = await fetch(
-        //         'https://jsonplaceholder.typicode.com/posts?_limit=' + limit
-        //     );
-        //     const posts = await res.json()
-        //     ctx.commit('updatePosts', posts)
-        // }
+        async axiosGetAllThemes(ctx) {
+
+            await axios.post(
+                'http://localhost:8080/themes/getAllThemes',
+            )
+                .then(response => {
+
+                    let r = response.data
+                    //console.log(r.themes[0])
+                   
+                    ctx.commit('allThemes', r.themes[0])
+                  //  ctx.commit('favBloggers', r.blogger)
+                })
+                .catch(error => {
+                    console.log(error)
+
+                });
+        },
+
+
     },
 
     mutations: {
-        // updatePosts(state, posts) {
-        //     state.posts = posts
-        // }
+        allThemes(state, themes) {
+            delete themes._id
+            delete themes.__v
+            state.themes = themes
+        }
     },
     state: {
-
+        themes: {}
     },
 
     getters: {
-
+        getAllThemes(state) {
+            return state.themes
+        }
     },
 }

@@ -9,6 +9,7 @@
 <script>
 import EmptyLayout from '@/layouts/EmptyLayout';
 import MainLayout from '@/layouts/MainLayout';
+import DashboardLayout from '@/layouts/DashboardLayout';
 
 export default {
 
@@ -35,7 +36,7 @@ export default {
     
   },
   components: {
-    EmptyLayout,MainLayout
+    EmptyLayout,MainLayout,DashboardLayout
   }
 };
 </script>
@@ -48,7 +49,7 @@ export default {
 :focus,:active{outline: none;}
 a:focus,a:active{outline: none;}
 nav,footer,header,aside{display: block;}
-html,body{height:100%;width:100%;font-size:100%;line-height:1;font-size:14px;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;}
+html,body{height:100%;width:100%;font-size:100%;line-height:1;font-size:14px;-ms-text-size-adjust:100%;-moz-text-size-adjust:100%;-webkit-text-size-adjust:100%;background-color:#f8f8f8;}
 input,button,textarea{font-family:inherit;}
 input::-ms-clear{display: none;}
 button{cursor: pointer;}

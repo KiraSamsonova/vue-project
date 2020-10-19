@@ -60,7 +60,6 @@ router.post('/createNewProfile', (req, res) => {
             console.log(b.name, user._id)
             // СОЗДАЁМ МОДЕЛЬ USER ДЛЯ BD
 
-
             let newBlogger = new Blogger({
                 belongTo: user._id,
                 name: b.name,
@@ -68,7 +67,8 @@ router.post('/createNewProfile', (req, res) => {
                 description: b.description,
                 image: 'default',
                 instagram: b.instagram,
-                communication: b.communication,
+                telegram: telegram,
+                showInCommunication: b.showInCommunication,
                 themes: b.themes,
                 subscribersNumber: b.subscribersNumber,
                 subscribersAge: b.subscribersAge,
@@ -79,7 +79,8 @@ router.post('/createNewProfile', (req, res) => {
                 AverageStory: b.AverageStory,
                 postPrice: b.postPrice,
                 storyPrice: b.storyPrice,
-                isCoopReady: b.isCoopReady
+                isCoopReady: b.isCoopReady,
+                engagement: b.engagement,
             })
 
             // СОХРАНЯЕМ НОВОГО blogger В BD 
@@ -101,82 +102,127 @@ router.post('/createNewProfile', (req, res) => {
 
 });
 
-router.post('/uploadBloggersImage', upload.single('image'), (req, res) => {
-    console.log('11111111111111111111111111')
-    console.log(req.file.originalname)
-    console.log('11111111111111111111111111')
-    let name = req.file.originalname
-    const preForWho = name.split('.')
-    preForWho.pop()
-    const forWho = preForWho[0]
-    console.log(forWho)
-    let id = { _id: forWho }
+router.post('/uploadBloggersImage',passport.authenticate('jwt', { session: false }), upload.single('image'), (req, res) => {
 
+    var token = getToken(req.headers);
 
-    if (req.file) {
-        Blogger.updateBloggersImage(id, { $set: { image: name } }, (err, blogger) => {
-            if (err) throw err
-            if (!blogger)
-                return res.json({ success: false, msg: 'проблема в обновлении бд' })
+    if (token) {
 
+        // ПОЛУЧАЕМ ID ИЗ ИМЕНИ ФАЙЛА
+        let name = req.file.originalname
+        const preForWho = name.split('.')
+        preForWho.pop()
+        const forWho = preForWho[0]
+        console.log(forWho)
+        let id = { _id: forWho }
+        
+        idDebugger(id, (isValid) => {
+
+            if (!isValid) return res.json({ success: false, msg: 'id не верен на этапе получения параметра' })
+
+            if (req.file) {
+                Blogger.updateBloggersImage(id, { $set: { image: name } }, (err, blogger) => {
+                    if (err) throw err
+                    if (!blogger) return res.json({ success: false, msg: 'проблема в обновлении бд' })
+                    else res.json({ success: true, msg: 'файл вроде загружен, а бд - обновлена' })
+                })
+
+            }
         })
-
-
-        res.json({ success: true, msg: 'файл вроде загружен, а бд - обновлена' })
-    }
-    else res.json({ success: false, msg: 'файл вроде НЕ загружен' })
+    } else return res.status(403).send({ success: false, msg: 'Unauthorized.' });
 });
 
-router.post('/replaceOneProfile', (req, res) => {
+router.post('/getEditingProfileInfo', passport.authenticate('jwt', { session: false }), (req, res) => {
 
-    console.log(req.body)
-    // console.log(req.body._id)
-    let id = req.body._id
-    //  console.log(id)
+    var token = getToken(req.headers);
+    if (token) {
 
+        let password = req.body.userInfo.password
+        let id = req.body.userInfo._id
+        let profileId = req.body.profileId
+        console.log(password, id, profileId)
+        idDebugger(profileId, (isValid) => {
 
-    let b = req.body
-    //   console.log('5ebca6b14d7f3f1e3c1703d9')
+            if (!isValid) return res.json({ success: false, msg: 'profileId не верен на этапе получения параметра' })
 
-    // console.log(b.belongTo.slice(1, b.belongTo.length - 1))
+            User.getUserById(id, (err, user) => {
+                if (err) throw err
+                if (!user) return res.json({ success: false, msg: 'invalid id' })
+    
+                User.comparePass(password, user.password, (err, isMatch) => {
+                    if (err) throw err
+                    if (isMatch) {
 
-    // .slice(1, req.body._id.length - 1),
-    let editedBlogger = {
-        belongTo: b.belongTo,
-        name: b.name,
-        isParticipant: b.isParticipant,
-        description: b.description,
-        image: b.image,
-        instagram: b.instagram,
-        communication: b.communication,
-        themes: b.themes,
-        subscribersNumber: b.subscribersNumber,
-        subscribersAge: b.subscribersAge,
-        country: b.country,
-        city: b.city,
-        SubscribersGender: b.SubscribersGender,
-        AveragePost: b.AveragePost,
-        AverageStory: b.AverageStory,
-        postPrice: b.postPrice,
-        storyPrice: b.storyPrice,
-        isCoopReady: b.isCoopReady
-    }
+                        // НАХОДИМ ПРОФИЛЬ ПО АЙДИ И БЕЛОНГИНС                    
+                        Blogger.getBloggerById(profileId, (err, blogger) => {
+                            if (err) throw err
+                            if (!blogger) return res.json({ success: false, msg: 'profileId не соответсвует айди ни одного блогера' })
+                            if (blogger.belongTo !== id) return res.json({ success: false, msg: 'ошибка: профиль не принадлежит юзеру' })
+                            return res.json({ success: true, msg: 'ура! Профиль найден!', blogger:blogger })
+                        })
+                    
+                    } else {
+                        return res.json({ success: false, reason: "invalid password", msg: 'Неверный пароль' })
+                    }
+                })
+            })        
+        })
+    } else return res.status(403).send({ success: false, msg: 'Unauthorized.' });
 
-    // СОХРАНЯЕМ обновленного blogger В BD
-    Blogger.editBlogger(id, editedBlogger, (err, blogger) => {
-        if (err) {
-            console.log(err)
-            res.json({ success: false, msg: 'blogger не был отредактирован' })
-        }
-        else {
+})
 
-            console.log(blogger)
+router.post('/replaceOneProfile', passport.authenticate('jwt', { session: false }), (req, res) => {
 
-            res.json({ success: true, msg: 'blogger был отредактирован!', blogger: blogger })
-        }
-    })
+    var token = getToken(req.headers);
 
-});
+    if (token) {
+        
+        let b = req.body
+        let id = b._id
+        console.log(id)
+        idDebugger(id, (isValid) => {
+
+            if (!isValid) return res.json({ success: false, msg: 'id не верен на этапе получения параметра' })
+
+            let editedBlogger = {
+                belongTo: b.belongTo,
+                name: b.name,
+                isParticipant: b.isParticipant,
+                description: b.description,
+                image: b.image,
+                instagram: b.instagram,
+                telegram: b.telegram,
+                showInCommunication: b.showInCommunication,
+                themes: b.themes,
+                subscribersNumber: b.subscribersNumber,
+                subscribersAge: b.subscribersAge,
+                country: b.country,
+                city: b.city,
+                SubscribersGender: b.SubscribersGender,
+                AveragePost: b.AveragePost,
+                AverageStory: b.AverageStory,
+                postPrice: b.postPrice,
+                storyPrice: b.storyPrice,
+                isCoopReady: b.isCoopReady,
+                engagement: b.engagement
+            }
+    
+            // СОХРАНЯЕМ обновленного blogger В BD
+            Blogger.editBlogger(id, editedBlogger, (err, blogger) => {
+                if (err) {
+                    console.log(err)
+                    res.json({ success: false, msg: 'blogger не был отредактирован' })
+                }
+                else {
+                    console.log(blogger)
+                    res.json({ success: true, msg: 'blogger был отредактирован!', blogger: blogger })
+                }
+            })
+
+        }) 
+    } else return res.status(403).send({ success: false, msg: 'Unauthorized.' });
+
+})
 
 router.post('/deleteProfile', (req, res) => {
 

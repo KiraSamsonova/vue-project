@@ -35,8 +35,8 @@
     margin-left: 278px;
     @include mainBreakpoint {
       margin-left: 0px;
-
     }
+
   }
   
 </style>

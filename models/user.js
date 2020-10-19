@@ -4,7 +4,6 @@ const config = require('../config/db');
 
 const UserSchema = mongoose.Schema({
 
-
     email: {
         type: String,
         required: true
@@ -12,6 +11,10 @@ const UserSchema = mongoose.Schema({
     isConfirmed: {
         type: Boolean,
         required: true
+    },
+    emailConfirmLink: {
+        type: String,
+        required: false
     },
     newPassLink: {
         type: String,
@@ -21,7 +24,6 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
-
     registrationDate: {
         type: Date,
         required: true
@@ -72,9 +74,9 @@ module.exports.getUserByEmail = function (email, callback) {
     User.findOne(query, callback)
 }
 
-module.exports.changeEmail = function (id, newEmail, isParticipant, callback) {
+module.exports.changeEmail = function (id, newEmail, isParticipant, emailConfirmLink, callback) {
     const query = { _id: id }
-    User.updateOne(query, { $set: { email: newEmail, isConfirmed: false, isParticipant: isParticipant } }, callback)
+    User.updateOne(query, { $set: { email: newEmail, isConfirmed: false, emailConfirmLink:emailConfirmLink, isParticipant: isParticipant } }, callback)
 }
 
 module.exports.updateUsersWithFilters = function (filterParam, changeableParam, callback) {
@@ -82,10 +84,9 @@ module.exports.updateUsersWithFilters = function (filterParam, changeableParam, 
     User.updateMany(query, { $set: changeableParam }, callback)
 }
 
-
-module.exports.isConfirmedTrue = function (id, callback) {
-    const query = { _id: id }
-    User.updateOne(query, { $set: { isConfirmed: true } }, callback)
+module.exports.emailConfirmation = function (emailConfirmLink, callback) {
+    const query = { emailConfirmLink: emailConfirmLink }
+    User.updateOne(query, { $set: { isConfirmed: true }, $unset: { emailConfirmLink: "" } }, callback)
 }
 
 module.exports.changingPassProcess = function (id, newPassLink, callback) {
@@ -93,10 +94,8 @@ module.exports.changingPassProcess = function (id, newPassLink, callback) {
     User.updateOne(query, { $set: { newPassLink: newPassLink } }, callback)
 }
 
-
 module.exports.changingPassCheck = function (passLink, callback) {
     const query = { newPassLink: passLink }
-
     User.findOne(query, callback)
 }
 
@@ -120,25 +119,28 @@ module.exports.updatePass = function (id, newPass, callback) {
 }
 
 module.exports.newPassSave = function (passLink, newPass, callback) {
-
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(newPass, salt, (err, hash) => {
             if (err) throw err
-            //  newPass = hash
-
             const query = { newPassLink: passLink }
             User.updateOne(query, { $set: { password: hash }, $unset: { newPassLink: "" } }, callback)
-
         })
     })
-
-    // User.updateOne(query, { $unset: { newPassLink: "" } }, callback)
 }
 
 module.exports.updateUserFavArr = function (id, favArr, callback) {
 
     const query = { _id: id }
     const editedData = { favourites: favArr }
+
+    User.updateOne(query, editedData, { upsert: true, }, callback)
+
+}
+
+module.exports.changeRole = function (id, role, callback) {
+
+    const query = { _id: id }
+    const editedData = { role: role }
 
     User.updateOne(query, editedData, { upsert: true, }, callback)
 

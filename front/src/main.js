@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Vuelidate from 'vuelidate'
 import App from './App.vue'
 import './registerServiceWorker'
 import router from './router'
@@ -9,10 +10,11 @@ Vue.prototype.$http = axios;
 const token = localStorage.getItem('user-token')
 if (token) {
   axios.defaults.headers.common['Authorization'] = token
-
 }
+
 Vue.config.productionTip = false
 
+Vue.use(Vuelidate)
 Vue.filter('numbers', numbersFilter)
 
 new Vue({

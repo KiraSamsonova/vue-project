@@ -46,21 +46,87 @@ let idDebugger = (id, cb) => {
 
 router.post('/allBloggers', (req, res) => {
 
-    //console.log(token)
+    let r = req.body
+    // Чистим от пустых строк и нулевых значений
+    for (var elem in r) {
+        let el = r[elem]
+        if (el === '' || el === null || el === false || typeof el === 'object' && el.length === 0) 
+            delete r[elem] 
+    }
+    console.log(r)
 
+    const createFiltersObj = () => {
+        let filtersObj = {}
+        if(r.themes) filtersObj.themes = { $in: r.themes }
+        if(r.country) filtersObj.country = r.country
+        if(r.city) filtersObj.city = r.city
+        if(r.subscribersAge) filtersObj.subscribersAge = { $in: r.subscribersAge }
+        if(r.SubscribersGender && !r.SubscribersGender.includes('Любой')) filtersObj.SubscribersGender = { $in: r.SubscribersGender}
 
+        if (r.sbcMin || r.sbcMax) {
 
-    console.log(req.body)
-    // let subscribersNumber = {
-    //     city: 'Москва'
-    // }
+            let subscribersNumber = {
+                $gte: r.sbcMin || 0, 
+                $lte: r.sbcMax || 1000000000
+            }
+            filtersObj.subscribersNumber = subscribersNumber
+        }
 
-    Blogger.getBloggersWithFilters(req.body, (err, blogger) => {
+        if (r.postRangeMin || r.postRangeMax) {
+            let AveragePost = {
+                $gte: r.postRangeMin || 0, 
+                $lte: r.postRangeMax || 1000000000
+            }
+            filtersObj.AveragePost = AveragePost
+        }
+
+        if (r.storyRangeMin || r.storyRangeMax) {
+            let AverageStory = {
+                $gte: r.storyRangeMin || 0, 
+                $lte: r.storyRangeMax || 1000000000
+            }
+            filtersObj.AverageStory = AverageStory
+        }
+
+        if (r.engagementMin || r.engagementMax) {
+            let engagement = {
+                $gte: r.engagementMin || 0, 
+                $lte: r.engagementMax || 100000000
+            }
+            filtersObj.engagement = engagement
+        }
+
+        if (r.postPriceMin || r.postPriceMax) {
+            let postPrice = {
+                $gte: r.postPriceMin || 0, 
+                $lte: r.postPriceMax || 1000000000
+            }
+            filtersObj.postPrice = postPrice
+        }
+
+        if (r.storyPriceMin || r.storyPriceMax) {
+            let storyPrice = {
+                $gte: r.storyPriceMin || 0, 
+                $lte: r.storyPriceMax || 1000000000
+            }
+            filtersObj.storyPrice = storyPrice
+        }
+
+        if(r.isParticipant) filtersObj.isParticipant = r.isParticipant
+        
+        if(r.isCoopReady) filtersObj.isCoopReady = r.isCoopReady
+
+        console.log(filtersObj)
+        return filtersObj
+// Тестить, тестить и ещё раз тестить!
+    }
+
+    Blogger.getBloggersWithFilters(createFiltersObj(), (err, blogger) => {
         if (err) throw err
         if (!blogger)
             return res.json({ success: false, msg: 'Блогеры не найдены' })
         else {
-            // console.log(blogger)
+             console.log(blogger.length)
             res.json({ success: true, blogger: blogger, msg: 'Блогеры найдены' })
         }
     });
@@ -68,6 +134,27 @@ router.post('/allBloggers', (req, res) => {
 
 })
 
+router.post('/findBloggerById', (req, res) => {
+
+    let r = req.body.id
+
+    console.log(r)
+
+    idDebugger(r, (isValid) => {
+
+        if (!isValid) return res.json({ success: false, msg: 'id isNotValid' })
+
+        Blogger.getBloggerById(r, (err, blogger) => {
+            if (err) throw err
+            if (!blogger)
+                return res.json({ success: false, msg: 'Блогер не найден' })
+            else {
+
+                res.json({ success: true, blogger: blogger, msg: 'Блогер найден' }) 
+            }
+        });
+    })
+})
 
 router.post('/showFavBloggers', passport.authenticate('jwt', { session: false }), (req, res) => {
     var token = getToken(req.headers);

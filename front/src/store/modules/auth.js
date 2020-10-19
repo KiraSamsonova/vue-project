@@ -22,12 +22,13 @@ export default {
                             localStorage.setItem('favArr', JSON.stringify(r.favourites))
                         }
                         console.log(user)
-
+                        user.password = value.password
                         localStorage.setItem('user-token', token)
                         localStorage.setItem('user', JSON.stringify(user))
                         axios.defaults.headers.common['Authorization'] = token
+
                         ctx.commit('auth_success', [token, user])
-                        router.push('/dashboard')
+                        router.push('/settings')
                     }
                 })
                 .catch(error => {
@@ -48,8 +49,6 @@ export default {
 
     mutations: {
         authentificationResponse(state, response) {
-            // localStorage.setItem('email', JSON.stringify(response.user.email))
-            // localStorage.setItem('id', JSON.stringify(response.user._id))
 
             state.registrationResponse = response
             if (response.success == true) {
@@ -74,14 +73,33 @@ export default {
             state.status = ''
             state.token = ''
         },
+        
         changeEmail(state, updatedData) {
-            let user = JSON.parse(localStorage.getItem('user'))
-            user.email = updatedData.email,
-                user.isParticipant = updatedData.isParticipant
-            localStorage.setItem('user', JSON.stringify(user))
-            console.log(state.user.email)
-            state.user = user
+
+            console.log(email)
+            console.log(state.user)
+            state.user.email = updatedData.email
+            state.user.isParticipant = updatedData.isParticipant
+            state.user.isConfirmed = false
+            console.log(state.user)
+            localStorage.setItem('user', JSON.stringify(state.user))
         },
+
+        changeRole(state, role) {
+            console.log(role)
+            console.log(state.user)
+            state.user.role = role
+            console.log(state.user)
+            localStorage.setItem('user', JSON.stringify(state.user))
+        },
+
+        changePassword(state, password) {
+            console.log(password)
+            console.log(state.user)
+            state.user.password = password
+            console.log(state.user)
+            localStorage.setItem('user', JSON.stringify(state.user))
+        }
 
     },
     state: {
@@ -92,7 +110,6 @@ export default {
         user: JSON.parse(localStorage.getItem('user')) || {},
 
     },
-
 
     getters: {
         getAuthentificationResponse(state) {
@@ -114,6 +131,13 @@ export default {
             console.log(state.user)
             return state.user
         },
-
+        emailErrorText(state) { 
+            if(state.errMsg == 'email') return 'E-mail не найден в базе'
+            return 'Введите E-mail'
+        },
+        passwordErrorText(state) {
+            if(state.errMsg == 'password') return 'Неверный пароль'
+            return 'Введите пароль'
+        }
     },
 }

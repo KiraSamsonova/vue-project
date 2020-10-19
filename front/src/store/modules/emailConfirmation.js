@@ -2,49 +2,34 @@ import axios from 'axios'
 import router from '@/router/index.js'
 export default {
     actions: {
-        async axiosEmailConfirmation(ctx, value) {
+        async axiosEmailConfirmation(ctx, confirmLink) {
 
             await axios.post(
-                'http://localhost:8080/account/confirmEmail', { confirmLink: value },
+                'http://localhost:8080/account/confirmEmail', { confirmLink: confirmLink },
             )
                 .then(response => {
                     let r = response.data
-
-                    if (r.success === false)
-                        ctx.commit('errorMsg', r.msg)
+                    console.log(r)
+                    if (!r.success)
+                        alert('err')
                     else {
-                        console.log(r.msg)
-                        ctx.commit('loading2')
+                        router.push('/home')
                     }
                 })
                 .catch(error => {
                     console.log(error)
-
                 });
         },
 
     },
 
     mutations: {
-        errorMsg(state, msg) {
-            state.msg = msg
-        },
-        loading2(state) {
-
-            state.loading2 = !state.loading2
-        }
+      
     },
     state: {
-        loading2: true,
-        msg: "",
+
     },
 
     getters: {
-        msg(state) {
-            return state.msg
-        },
-        loading2(state) {
-            return state.loading2
-        }
-    },
+    }
 }

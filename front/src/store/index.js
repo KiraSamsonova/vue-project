@@ -7,6 +7,10 @@ import Auth from './modules/auth'
 import Profiles from './modules/profiles'
 import Bloggers from './modules/bloggers'
 import NewProfile from './modules/newProfile'
+import EditProfile from './modules/editProfile'
+import ChangeRole from './modules/changeRole'
+import ChangeEmail from './modules/changeEmail'
+import ChangePassword from './modules/changePassword'
 import FilterStaticData from './modules/filterStaticData'
 import NewPassword from './modules/newPassword'
 import ForgottenPassword from './modules/forgottenPassword'
@@ -29,6 +33,6 @@ export default new Vuex.Store({
   modules: {
     Test, Filters, Registration, Auth, Profiles, NewProfile,
     Bloggers, FilterStaticData, NewPassword, ForgottenPassword,
-    EmailConfirmation, PersonalData, favBloggers
+    EmailConfirmation, PersonalData, favBloggers,ChangeRole, ChangeEmail, ChangePassword, EditProfile
   }
 })

@@ -18,7 +18,7 @@
 
               <router-link :to="'/home'" class="big-links-group__single">
 
-                <svg version="1.1" class="big-links-group__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                <svg version="1.1" class="big-links-group__svg" id="blogger-search-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                   viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
                   <g>
                     <circle cx="16" cy="7.8" r="2.1"/>
@@ -40,7 +40,7 @@
 
               <router-link :to="'/home'" class="big-links-group__single">
 
-                <svg version="1.1" class="big-links-group__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                <svg version="1.1" class="big-links-group__svg" id="sign-up-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                   viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
 
                   <g>
@@ -69,7 +69,7 @@
 
               <router-link :to="'/home'" class="big-links-group__single">
 
-                <svg version="1.1" class="big-links-group__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                <svg version="1.1" class="big-links-group__svg" id="enter-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                   viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
                   <g>
                     <path d="M3.6,2C3.7,2,3.7,2,3.6,2l8.1,0C13,2,14,3,14,4.3V5c0,0.4-0.3,0.8-0.7,0.8S12.5,5.4,12.5,5V4.3c0-0.4-0.3-0.7-0.8-0.7H8.3
@@ -113,7 +113,7 @@
 
               <router-link :to="'/home'" class="big-links-group__single">
 
-                <svg version="1.1" class="big-links-group__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                <svg version="1.1" class="big-links-group__svg" id="for-bloger-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                   viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
                   <g>
                     <circle cx="7.9" cy="5.3" r="4.1"/>
@@ -127,7 +127,7 @@
                   </g>
                 </svg>
 
-                <span class="big-links-group__text">Для блорега</span>
+                <span class="big-links-group__text">Для блогера</span>
 
               </router-link>
 
@@ -170,7 +170,7 @@
           </div>
 
           <footer class="menu__footer">
-            <h5 class="menu__prime-bloggers">&copy; 2020 PrimeBloggers</h5>
+            <h5 class="menu__prime-bloggers">&copy; 2020 Rockstarbloggers</h5>
             <div class="menu__footer-group-link">
               <router-link class="menu__footer-link-single" :to="'/home'">Контакты</router-link>
               <router-link class="menu__footer-link-single" :to="'/home'">Оферта</router-link>
@@ -185,12 +185,12 @@
 
     <div v-bind:class="{'main-menu__cross-wrapper': menuActive}" class="main-menu__burger-wrapper">
       
-      <div class="main-menu__burger" v-if='!menuActive' v-on:click="menuActive=!menuActive">
+      <div class="main-menu__burger" v-if='!menuActive' v-on:click="showMenu()">
         <span></span>
       </div>
     
       <svg version="1.1" class="main-menu__cross" 
-        v-if='menuActive' v-on:click="menuActive=!menuActive" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+        v-if='menuActive' v-on:click="hideMenu()" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
             viewBox="0 0 12 12" style="enable-background:new 0 0 12 12;" xml:space="preserve">
           <polygon points="12,0.6 11.4,0 6,5.4 0.6,0 0,0.6 5.4,6 0,11.4 0.6,12 6,6.6 11.4,12 12,11.4 6.6,6 "/>
       </svg>
@@ -201,19 +201,38 @@
     
     </div>
 
-    <div class="main-menu__fullscreenShadow" v-bind:class="{fullscreenShadowActive:menuActive}" v-on:click="menuActive=!menuActive"></div>
+    <div class="main-menu__fullscreenShadow" v-bind:class="{fullscreenShadowActive:menuActive}" v-on:click="hideMenu()"></div>
 
   </div>
 </template>
 
 <script>
+  import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
+
+  import 'simplebar'; // or "import SimpleBar from 'simplebar';" if you want to use it manually.
+  import 'simplebar/dist/simplebar.css';
+
   export default {
     name: 'YellowMenu',
-    data() {
+
+
+    data() { 
       return {
         menuActive: false,
       }
      },
+
+    methods: {
+      showMenu() {
+        this.menuActive = true
+        disableBodyScroll(document.getElementsByTagName('body'))
+      },
+
+      hideMenu() {
+        this.menuActive = false
+        enableBodyScroll(document.getElementsByTagName('body'))
+      }
+    } 
 
   }
 
@@ -233,22 +252,21 @@
   }
 
   .main-menu {
-    
     &__burger-wrapper {
       display: none;
       position: absolute;
       top: 23px;
       left:15px;
-      -webkit-transition: all 0.5s ease 0s;
-      transition: all 0.5s ease 0s;
+      // -webkit-transition: all 0.5s ease 0s;
+      // transition: all 0.5s ease 0s;
       @include mainBreakpoint {
         display: block;
       }
     }
 
     &__cross-wrapper {
-      -webkit-transition: all 0.5s ease 0s;
-      transition: all 0.5s ease 0s;
+      // -webkit-transition: all 0.5s ease 0s;
+      // transition: all 0.5s ease 0s;
       left:293px;
       top:12px
     }
@@ -308,13 +326,13 @@
       top: 0px;
       width: 100%;
       height: 100%;
-      opacity: 10%;
+      opacity: 0.1;
       background-color: black;
     }
 
     .fullscreenShadowActive {
       display: block;
-      opacity: 80%;
+      opacity: 0.8;
     }
   
 
@@ -348,10 +366,29 @@
   
     .menu {
       margin-right: 5px;
+      -ms-overflow-style: auto;  /* IE and Edge */
+      scrollbar-width: 50px;
+      scrollbar-width: none;  /* Firefox */
+  
+      width: 273px;
+      // position: fixed;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background-color: rgb(245,196,42);
 
       &::-webkit-scrollbar {
         width: 3px;
       } 
+
+      &::-ms-scrollbar {
+        width: 2px;
+      }
+      
+      &::-moz-scrollbar {
+        width: 2px;
+      }
 
       &::-webkit-scrollbar-thumb {
         max-height: 20px;
@@ -361,14 +398,6 @@
       &::-webkit-scrollbar-track {
         background-color: rgb(219,177,29); /* or add it to the track */
       } 
-
-      width: 273px;
-      // position: fixed;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      background-color: rgb(245,196,42);
 
       &__header {
         height: 217px;
@@ -393,7 +422,7 @@
       }
 
       &__footer {
-        margin: 57px 77px 0px 29px;
+        margin: 57px 77px 30px 29px;
         width: 167px;
         height: 86px;
         display: flex;
@@ -468,15 +497,14 @@
     .big-links-group {
       display: flex;
       flex-direction: column;
-      justify-content: space-around;
+      justify-content: space-between;
       margin-left:30px;
-      margin-right: 83px;
-
-      
+    
       &__single {
         display: flex;
         flex-direction: row;
         justify-content: left;
+
         &:hover {
           svg {
             fill: white;
@@ -493,7 +521,26 @@
       &__svg {
         width: 22px;
         height: 22px;
-        margin-right: 5px;
+        margin-right: 10px;
+        margin-top: -2px;
+      }
+
+      & #sign-up-svg {
+        margin-right: 11px;
+      }
+
+      & #enter-svg {
+        margin-left: 3px;
+        margin-right: 8px;
+      }
+
+      & #blogger-search-svg {
+        margin-left: 1px;
+      }
+
+      & #for-bloger-svg {
+        margin-left: 3px;
+        margin-right: 7px;
       }
 
       &__text {

@@ -1,40 +1,14 @@
 <template>
-  <div>
-        <!-- <div class="level">
-            <label>Level:</label><br/>
-            <input type="range" min="1" max="5" list="num" />
-            <datalist id="num" class="datalist">
-                <option value="1" label="1"></option>
-                <option value="2" label="2"></option>
-                <option value="3" label="3"></option>
-                <option value="4" label="4"></option>
-                <option value="5" label="5"></option>
-            </datalist>        
-        </div> -->
-
-
-    <div class="wrap"
-
-     v-bind:style="{'--a': a, '--b': b}">
-
-      <input type="range" min="1" max="7" list="num" v-model="a" v-on:change="inputA(a)"  />
-
-
-
-
-      <input type="range" min="1" max="7" list="num" v-model="b" v-on:change="inputB(b)"/>
-
-    </div>
-      <!-- <datalist id="num">
-          <option label="13"></option>
-          <option label="18"></option>
-          <option label="25"></option>
-          <option label="35"></option>
-          <option label="45"></option>
-          <option label="55"></option>
-          <option label="65+"></option>
-        </datalist>  -->
+<div class="flex">
+<p class="checker" v-on:click="role=false">111111</p>
+  <div class="test1">
+    
+<input type="checkbox" class="toggle" id='toggle' v-model="role" checked>
+<label for="toggle" class="toggle__comma" v-bind:class="{'toggle__comma-checked': role}">·</label>  
+  
   </div>
+   <p class="checker" v-on:click="role=true">22222</p>
+   </div>
 </template>
 
 <script>
@@ -43,154 +17,71 @@ import {mapGetters,mapActions} from 'vuex'
 export default {
   name: 'Test',
   data() {
-    return {
-      a: 1,
-      b: 7
-    }
-  },
-
-  methods: {
-    inputA(v) {
-      console.log(v)
-    },
-       inputB(v) {
-      console.log(v)
-    }
+      return {
+        role: false,
+      }
   }
 }
 </script>
 
 <style lang="scss" scoped>
 
-.wrap {
-  display: grid;
-  grid-template: repeat(1, max-content)/ 1fr;
-  overflow: visible;
+.flex {
+  display: flex;
+  align-items: center;
+  margin: 320px 810px;
+}
+.test1 {
   position: relative;
-  margin: 1em auto;
-  height: 3px;
-  width: 172px;
-  background: grey;
-  border-radius: 5px;
-  &::before{ 
+}
 
-    grid-column: 1;
-    grid-row: 1;
-    background: black;
-    content: "";
+.toggle {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  background-color: #e6e6e6;
+  display: inline-block;
+  position: relative;
+  transition: all 0.2s ease;
+  width: 28px;
+  height: 14px;
+  border-radius: 7px;
 
-    height: 3px;
-    z-index: 2;
-    overflow: hidden;
-
-    margin-left: calc(16px + (var(--a) - 1)/6*156px);
-
-    width: calc((var(--b) - var(--a))/6*156px - 16px);
+  &__comma{
+    position: absolute;
+    font-size: 70px;
+    color: #3f5baa;
+    top: -27px;
+    left: -5px;
+    transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);
   }
 }
 
-input[type='range'] {
-  -webkit-appearance: none; 
-  grid-column: 1;
-  grid-row: 1;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  margin: 0;
-  background: none;
-  width: 100%; 
-  z-index: 15;
-  color: #000;
-  pointer-events: none;
-  &::-webkit-slider-runnable-track {
-    -webkit-appearance: none;
-    width: 171px;
-    height: 4px;
-    cursor: pointer;
-    border-radius: 2px;
-    background: none;
-  }
-  &::-moz-range-track {
-    width: 171px;
-    height: 4px;
-    cursor: pointer;
-    background: none;
-    border-radius: 2px;
-  }
-  &::-ms-track {
-    width: 171px;
-    height: 8.4px;
-    cursor: pointer;
-    background: transparent;
-    border-color: transparent;
-    border-width: 16px 0;
-    color: transparent;
-  }
-  &::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    border: 1px solid #000000;
-    height: 16px;
-    width: 16px;
-    border-radius: 100%;
-    background: white;
-    cursor: pointer;
-    margin-top: -7px; 
-    overflow: hidden;
-    z-index: 100;
-    pointer-events: auto;
-  }
-  &::-moz-range-thumb {
-    border: 1px solid #000000;
-    height: 16px;
-    width: 16px;
-    border-radius: 100%;
-    background: #ffffff;
-    cursor: pointer;
-    z-index: 10;
-    overflow: hidden;
-  }
-  &::-ms-thumb {
-    border: 1px solid #000000;
-    height: 16px;
-    width: 16px;
-    border-radius: 100%;
-    background: #ffffff;
-    cursor: pointer;
-    z-index: 10;
-  }
+.checker {
+  margin: 10px;
+  background-color: yellow;
+  border: 1px red solid;
+  border-radius: 10px;
+  padding: 5px;
 }
 
+.toggle:after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  border-radius: 50%;
+  background: white;
+  transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);
+}
 
-// datalist {
-//   grid-column: 1;
-//   grid-row: 1;
-//   background: #fff;
-//   width: 107%;
-//   margin: 0px -8px;
-//   display: flex;
-//   justify-content: space-between;
-// }
-
-// datalist option {
-//   text-align: center;
-//   font-size: 11px;
-//   /* line-height: 28px; */
-//   font-family: 'Roboto-regular';
-//     -webkit-box-flex: 1;
-//     -webkit-flex-grow: 1;
-//         -ms-flex-positive: 1;
-//             flex-grow: 1;
-//     -webkit-flex-basis: 0;
-//         -ms-flex-preferred-size: 0;
-//             flex-basis: 0;
-// } 
-
-
-// .section {
-//   width: 150px;
-// }
-
-
+.toggle:checked:after, .toggle__comma-checked{
+  transform: translatex(13px);
+}
 
 
 </style>

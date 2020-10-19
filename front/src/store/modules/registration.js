@@ -3,6 +3,7 @@ export default {
 
     actions: {
         async fetchReg(ctx, value = {}) {
+            ctx.commit('emailIsInUse', '')
             const res = await fetch(
                 'http://localhost:8080/account/registration', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -18,21 +19,31 @@ export default {
                 body: JSON.stringify(value) // body data type must match "Content-Type" header
             }
             );
-            const response = await res.json()
-            if (response.success === true) router.push('/login')
-            else console.log(response.msg)
+            
+            const r = await res.json()
+            if(!r.success && r.msg === "Пользователь с таким email уже существует")  
+            ctx.commit('emailIsInUse', r.msg)
+
+            else if (r.success) router.push('/login')
+
+            else console.log(r.msg)
+
         }
     },
 
     mutations: {
-
+        emailIsInUse(state, msg) {
+            state.emailIsInUse = msg
+        }
     },
     state: {
-
+        emailIsInUse: ''
     },
 
     getters: {
-
+        emailIsInUse(state) {
+            return state.emailIsInUse
+        }
 
     },
 }

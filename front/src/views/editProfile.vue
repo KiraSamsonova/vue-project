@@ -23,7 +23,7 @@
       
     <h2 class="subtitle subtitle-newProfile">Новый профиль</h2>
 
-    <form class="profile-form" @submit.prevent="createNewProfile()">
+    <form class="profile-form" @submit.prevent="editProfile()">
 
       <div class="row row_first" v-bind:class="{'error_first-row': $v.instagram.$error}">
 
@@ -36,41 +36,9 @@
 
         </div>
 
-        <div v-if="fd === null" for="photo" class="profile-form__photo-wrapper" v-on:click="toggleDownloadModal()">
-
-          <svg version="1.1" class="profile-form__photo-big" v-bind:class="{'error error_photo': $v.fd.$error}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-            viewBox="0 0 60 60" style="enable-background:new 0 0 60 60;" xml:space="preserve">
-
-            <path class="bigPhoto0" d="M30,60L30,60C13.4,60,0,46.6,0,30v0C0,13.4,13.4,0,30,0h0c16.6,0,30,13.4,30,30v0C60,46.6,46.6,60,30,60z"/>
-            <circle class="bigPhoto1" cx="30" cy="21" r="7.3"/>
-            <path class="bigPhoto1" d="M35,31.3h-0.5c-1.4,0.7-2.9,1-4.5,1s-3.1-0.4-4.5-1H25c-4.1,0-7.5,3.4-7.5,7.5v0.4c0,1.1,0.4,2.1,1.2,2.9
-              c1.5,1.4,3.3,2.6,5.3,3.3c0,0,0,0,0,0c0,0,0.1,0,0.1,0c0.3,0.1,0.6,0.2,0.9,0.3c0.2,0.1,0.3,0.1,0.5,0.2c0.2,0.1,0.4,0.1,0.6,0.2
-              c1.2,0.3,2.5,0.5,3.8,0.5c1,0,2-0.1,2.9-0.3h0c0,0,0,0,0,0c0.4-0.1,0.8-0.2,1.2-0.3c0.1,0,0.2-0.1,0.3-0.1c0.3-0.1,0.7-0.2,1-0.3
-              c0.1,0,0.3-0.1,0.4-0.1c0.2-0.1,0.3-0.1,0.5-0.2c0,0,0,0,0,0c1.8-0.8,3.5-1.8,4.9-3.2c0.8-0.7,1.2-1.8,1.2-2.9v-0.4
-              C42.5,34.6,39.1,31.3,35,31.3z"/>
-          </svg>
-
-          <svg version="1.1" class="profile-form__photo-small" v-bind:class="{'error_plus': $v.fd.$error}" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-            viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
-
-            <g>
-              <circle class="photoSmall0" cx="8" cy="8" r="8"/>
-              <path class="photoSmall1" d="M8,0.5c4.1,0,7.5,3.4,7.5,7.5s-3.4,7.5-7.5,7.5S0.5,12.1,0.5,8S3.9,0.5,8,0.5 M8-0.5C3.3-0.5-0.5,3.3-0.5,8
-                s3.8,8.5,8.5,8.5s8.5-3.8,8.5-8.5S12.7-0.5,8-0.5L8-0.5z"/>
-            </g>
-            <path class="photoSmall1" d="M11.9,8.6H4.1C3.8,8.6,3.5,8.4,3.5,8v0c0-0.4,0.3-0.6,0.6-0.6h7.7c0.4,0,0.6,0.3,0.6,0.6v0
-              C12.5,8.4,12.2,8.6,11.9,8.6z"/>
-            <path class="photoSmall1" d="M7.3,11.9V4.1c0-0.4,0.3-0.6,0.6-0.6h0c0.4,0,0.6,0.3,0.6,0.6v7.7c0,0.4-0.3,0.6-0.6,0.6h0
-              C7.6,12.5,7.3,12.2,7.3,11.9z"/>
-          </svg>
-
-        </div>
-
-        <div v-if="fd !== null" for="photo" class="profile-form__photo-wrapper" v-on:click="toggleDownloadModal()">
-
-
-        <img :src="fileURL" alt="mistake" class="profile-form__photo-big">
-
+        <div v-if="fd === null && fileURL !== ''" for="photo" class="profile-form__photo-wrapper" v-on:click="toggleDownloadModal()">
+        
+        <img :src="require(`@/assets/uploads/${fileURL}`)" alt="mistake" class="profile-form__photo-big">
 
           <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
             viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
@@ -101,6 +69,38 @@
 
         </div>
 
+        <div v-if="fd !== null" for="photo" class="profile-form__photo-wrapper" v-on:click="toggleDownloadModal()">
+        
+        <img :src="fileURL" alt="mistake" class="profile-form__photo-big">
+
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+
+            <g>
+              <circle class="photoSmall0" cx="8" cy="8" r="8"/>
+              <path class="photoSmall1" d="M8,0.5c4.1,0,7.5,3.4,7.5,7.5s-3.4,7.5-7.5,7.5S0.5,12.1,0.5,8S3.9,0.5,8,0.5 M8-0.5C3.3-0.5-0.5,3.3-0.5,8
+                s3.8,8.5,8.5,8.5s8.5-3.8,8.5-8.5S12.7-0.5,8-0.5L8-0.5z"/>
+            </g>
+            <path class="photoSmall1" d="M11.9,8.6H4.1C3.8,8.6,3.5,8.4,3.5,8v0c0-0.4,0.3-0.6,0.6-0.6h7.7c0.4,0,0.6,0.3,0.6,0.6v0
+              C12.5,8.4,12.2,8.6,11.9,8.6z"/>
+            <path class="photoSmall1" d="M7.3,11.9V4.1c0-0.4,0.3-0.6,0.6-0.6h0c0.4,0,0.6,0.3,0.6,0.6v7.7c0,0.4-0.3,0.6-0.6,0.6h0
+              C7.6,12.5,7.3,12.2,7.3,11.9z"/>
+          </svg>
+
+          <svg version="1.1" class="profile-form__photo-small" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+            viewBox="0 0 16 16" style="enable-background:new 0 0 16 16;" xml:space="preserve">
+            <g>
+              <circle class="photoSmall0" cx="8" cy="8" r="8"/>
+              <path class="photoSmall1" d="M8,0.5c4.1,0,7.5,3.4,7.5,7.5s-3.4,7.5-7.5,7.5S0.5,12.1,0.5,8S3.9,0.5,8,0.5 M8-0.5C3.3-0.5-0.5,3.3-0.5,8
+                s3.8,8.5,8.5,8.5s8.5-3.8,8.5-8.5S12.7-0.5,8-0.5L8-0.5z"/>
+            </g>
+            <g>
+              <rect x="9.3" y="4.7" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -1.2275 8.8641)" class="photoSmall1" width="1.6" height="2.4"/>
+              <polygon class="photoSmall1" points="8.1,6.2 4.9,9.4 4.5,11.5 6.6,11.1 9.8,7.9 	"/>
+            </g>
+          </svg>
+
+        </div>
       </div>
 
       <div class="row" v-bind:class="{'error_row': $v.country.$error}">
@@ -379,7 +379,7 @@
 
         <label for="telegramm" class="label">Telegram:</label>
 
-        <input type="text" name="telegramm" id="telegramm" v-model="telegramm" class="input input_telegramm">
+        <input type="text" name="telegramm" id="telegramm" v-model="telegram" class="input input_telegramm">
 
     
         <label for="showInCommunication" class="checkbox checkbox__label checkbox__label_telegramm">
@@ -481,10 +481,10 @@
   import {mapGetters,mapActions} from 'vuex'
   import { required, sameAs, minLength, maxLength } from 'vuelidate/lib/validators'
   import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-  
-  export default {
-    name: 'newProfile',
 
+  export default {
+    name: 'editProfile',
+    
     data() {
       return {
         downloadModalActive: false,
@@ -556,27 +556,57 @@
       storyPrice: {
         required,
       },
-      fd: {
-        required,
-      },
       isCoopReady:{
         required
       },
      
     },
-  
-    computed: 
-      mapGetters(["allThemes", "allCountries", "allCities","allAgeCat","allGenderCat",
+
+    computed: { 
+      ...mapGetters(["getEditingProfile","allThemes", "allCountries", "allCities","allAgeCat","allGenderCat",
         "getNewProfileIsCreated","getLoader",'getUser', 'getAllThemes']),
+            
+      profile () {
+        return this.getEditingProfile
+      }
+    },
+
+    watch: {
+      profile (newProfile, oldProfile) {
+        console.log('profile was updated')
+        console.log(newProfile)
+        this.description = this.profile.description,
+        this.fileURL = this.profile.image,
+        this.instagram = this.profile.instagram,
+        this.telegram = this.profile.telegram,
+        this.showInCommunication = this.profile.showInCommunication,
+        this.themes =  this.profile.themes,
+        this.subscribersNumber = this.profile.subscribersNumber,
+        this.subscribersAge = this.profile.subscribersAge,
+        this.country = this.profile.country,
+        this.city = this.profile.city,
+        this.SubscribersGender = this.profile.SubscribersGender,
+        this.AveragePost=this.profile.AveragePost,
+        this.AverageStory=this.profile.AverageStory,
+        this.postPrice=this.profile.postPrice,
+        this.storyPrice=this.profile.storyPrice,
+        this.engagement = this.profile.engagement
+        this.isCoopReady=this.profile.isCoopReady
+
+      }
+    },
 
     mounted() {
       this.inputRange()
       this.axiosGetAllThemes() 
 
+      const urlParams = new URLSearchParams(window.location.search);
+      const id = urlParams.get('id')
+      this.axiosGetEditingProfileInfo(id)
     },
 
     methods: {
-      ...mapActions(["axiosCreateNewProfile","axiosReplaceOneProfile", 'axiosGetAllThemes']),
+      ...mapActions(["axiosCreateNewProfile","axiosReplaceOneProfile", 'axiosGetAllThemes', 'axiosGetEditingProfileInfo']),
 
       toggleDownloadModal() {
         this.downloadModalActive = !this.downloadModalActive;
@@ -585,7 +615,6 @@
 
         else enableBodyScroll(document.getElementsByTagName('body'))
       },
-
 
       inputRange(){
         this.chosenOptionsAges = []
@@ -615,14 +644,6 @@
           }
         })
 
-            // console.log(document.getElementById(`${this.themes[0]}`))
-            //    this.themeNumber = this.themes.length + 1
-            //  if(this.themeNumber >3) this.testtest = true
-
-            //    this.themes.forEach(elem => {
-            //   document.getElementById(elem)
-            // .disabled = false
-            // });
       },
 
       onFileSelected(event) {
@@ -633,35 +654,35 @@
         console.log(ext)
         if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') {
 
-        if(event.target.files[0].size >= 5000000) return this.downloadErrorText = 'файл слишком большой'
-        
-        this.downloadErrorText = ''
-        this.downloadModalActive = false
-        enableBodyScroll(document.getElementsByTagName('body'))
-        this.fd = new FormData();
-        this.fd.append('image', file, `pre.${ext}`)
+          if(event.target.files[0].size >= 5000000) return this.downloadErrorText = 'файл слишком большой'
+          
+          this.downloadErrorText = ''
+          this.downloadModalActive = false
+          enableBodyScroll(document.getElementsByTagName('body'))
+          this.fd = new FormData();
+          this.fd.append('image', file, `pre.${ext}`)
 
-        this.fileURL = URL.createObjectURL(file)
-        console.log(this.fd)
+          this.fileURL = URL.createObjectURL(file)
+          console.log(this.fd)
 
         } else this.downloadErrorText = 'problem with fileExtension'
       },
 
-      createNewProfile() {
+      editProfile() {
+        
         this.$v.$touch()
         if(this.$v.$error) return false
-      
+        console.log('start')
         // Выделение имени из ulr-адрес-профиля
         let UrlClear = this.instagram.split('?')[0]
         if (UrlClear.endsWith("/")) UrlClear = UrlClear.slice(0, UrlClear.length-+1)
         let name = UrlClear.split('/')[UrlClear.split('/').length-+1]
-
-        // Создание константы нового профиля
         const newProfile = {
           belongTo: this.getUser._id,
           name: name,
           description: this.description,
           instagram: this.instagram,
+          telegram: this.telegram,
           showInCommunication: this.showInCommunication,
           themes: this.themes,
           subscribersNumber: this.subscribersNumber,
@@ -672,18 +693,23 @@
           AveragePost:this.AveragePost,
           AverageStory: this.AverageStory,
           engagement: this.engagement,
-          telegram: this.telegram,
           postPrice: this.postPrice,
           storyPrice: this.storyPrice,
-          isCoopReady: this.isCoopReady
-        }
+          isCoopReady: this.isCoopReady,
+          image: this.profile.image,
+          _id: this.profile._id
+        };
 
-        // Удаление города при изменении страны
-        if( !this.allCities[this.country]) newProfile.city = ''
+        if (!this.allCities[this.country]) newProfile.city = '';
 
-        this.axiosCreateNewProfile([this.fd, newProfile])  
+        console.log(newProfile);
+        
+        this.axiosReplaceOneProfile([this.fd, newProfile])
+
       },
+
     },
+
   }
 </script>
 

@@ -43,21 +43,21 @@ export default {
                 });
         },
 
-
-
         updateFavArr(ctx, whatToDo) {
             console.log(whatToDo)
             let favArr = ctx.getters.getFavArr
+            let favBloggers = ctx.getters.favBloggers
             if (whatToDo[1]) { // Добавляем
                 favArr.push(whatToDo[0])
             }
             else if (!whatToDo[1]) { // убираем
-
                 favArr = favArr.filter(elem => elem !== whatToDo[0])
+                favBloggers = favBloggers.filter(elem => elem._id !== whatToDo[0])
             }
             console.log(favArr)
             localStorage.setItem('favArr', JSON.stringify(favArr))
             ctx.commit('favArr', favArr)
+            ctx.commit('favBloggers', favBloggers)
         }
     },
 

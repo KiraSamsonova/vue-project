@@ -24,10 +24,6 @@ const BloggerSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    communication: {
-        type: String,
-        required: true
-    },
     isParticipant: {
         type: Boolean,
         required: true
@@ -41,7 +37,7 @@ const BloggerSchema = mongoose.Schema({
         required: true
     },
     subscribersAge: {
-        type: String,
+        type: Array,
         required: true
     },
     country: {
@@ -73,12 +69,23 @@ const BloggerSchema = mongoose.Schema({
         type: Number,
         required: true
     },
+
+    telegram: {
+        type: String,
+        required: true
+    },
+    showInCommunication: {
+        type: Boolean,
+        required: true
+    },
     isCoopReady: {
         type: Boolean,
         required: true
     },
-
-
+    engagement: {
+        type: Number,
+        required: true 
+    },
 })
 
 const Blogger = module.exports = mongoose.model('Blogger', BloggerSchema)
@@ -88,6 +95,11 @@ module.exports.addBlogger = function (newBlogger, callback) {
     newBlogger.save(callback)
 
 }
+
+module.exports.getBloggerById = function (id, callback) {
+    Blogger.findById(id, callback)
+}
+
 
 module.exports.deleteBlogger = function (id, callback) {
 

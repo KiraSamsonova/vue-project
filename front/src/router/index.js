@@ -3,6 +3,7 @@ import Store from '../store/index.js';
 import VueRouter from 'vue-router'
 import Home from '../views/home.vue'
 import Test from '../views/Test.vue'
+import NewProfile from '../views/newProfile.vue'
 import Filters from '../views/filters.vue'
 import Auth from '../views/auth.vue'
 import NewPassword from '../views/newPassword.vue'
@@ -13,67 +14,94 @@ Vue.use(VueRouter)
 const routes = [
 
   {
-    path: '/test',
+    path: '/test', 
     name: 'Test',
-    meta: { layout: 'empty', auth: 0 },
+    meta: { layout: 'empty', auth: 0, roleNeeded: 0 },
     component: () => import('../views/Test.vue')
   },
   {
     path: '/test2',
     name: 'Test2',
-    meta: { layout: 'empty', auth: 0 },
+    meta: { layout: 'empty', auth: 0, roleNeeded: 0 },
     component: () => import('../views/Test2.vue')
   },
-  {
-    path: '/filters',
-    name: 'filters',
-    meta: { layout: 'empty', auth: 0 },
-    component: () => import('../views/filters.vue')
-  },
+
   {
     path: '/registration',
     name: 'registration',
-    meta: { layout: 'empty', auth: -1 },
+    meta: { layout: 'main', auth: -1, roleNeeded: 0 },
     component: () => import('../views/registration.vue')
   },
   {
-    path: '/emailConfirmation/:confirmData',
+    path: '/emailConfirmation',
     name: 'emailConfirmation',
-    meta: { layout: 'empty', auth: 0 },
+    meta: { layout: 'main', auth: 0, roleNeeded: 0 },
     component: () => import('../views/emailConfirmation.vue')
   },
   {
-    path: '/newPassword/:passLink',
+    path: '/newPassword',
     name: 'newPassword',
-    meta: { layout: 'empty', auth: -1 },
+    meta: { layout: 'main', auth: -1, roleNeeded: 0 },
     component: () => import('../views/newPassword.vue')
   },
   {
     path: '/forgottenPassword',
     name: 'forgottenPassword',
-    meta: { layout: 'empty', auth: -1 },
+    meta: { layout: 'main', auth: -1, roleNeeded: 0 },
     component: () => import('../views/forgottenPassword.vue')
   },
-
 
   {
     path: '/login',
     name: 'auth',
-    meta: { layout: 'empty', auth: -1 },
+    meta: { layout: 'main', auth: -1, roleNeeded: 0 },
     component: () => import('../views/auth.vue')
   },
+
   {
-    path: '/dashboard',
-    name: 'dashboard',
-    meta: { layout: 'empty', auth: 1 },
-    component: () => import('../views/dashboard.vue')
+    path: '/settings',
+    name: 'settings',
+    meta: { layout: 'dashboard', auth: 1, roleNeeded: 0 },
+    component: () => import('../views/settings.vue')
+
   },
+
+  {
+    path: '/newProfile',
+    name: 'newProfile',
+    meta: { layout: 'dashboard', auth: 1, roleNeeded: 'blogger' },
+    component: () => import('../views/newProfile.vue')
+  },
+
+  {
+    path: '/editProfile',
+    name: 'editProfile',
+    meta: { layout: 'dashboard', auth: 1, roleNeeded: 'blogger' },
+    component: () => import('../views/editProfile.vue'),
+  },
+
+  {
+    path: '/favourites',
+    name: 'favourites',
+    meta: { layout: 'dashboard', auth: 1, roleNeeded: 0 },
+    component: () => import('../views/favBloggers.vue')
+
+  },
+
+  {
+    path: '/profiles',
+    name: 'profiles',
+    meta: { layout: 'dashboard', auth: 0, roleNeeded: 'blogger' },
+    component: () => import('../views/profiles.vue')
+  },
+
   {
     path: '/home',
     name: 'home',
-    meta: { layout: 'main', auth: 0 },
+    meta: { layout: 'main', auth: 0, roleNeeded: 0 },
     component: () => import('../views/home.vue')
   },
+
 ]
 
 const router = new VueRouter({
@@ -96,6 +124,18 @@ router.beforeEach((to, from, next) => {
     next()
   }
 
+  let usersRole = Store.getters.getUser.role
+  let roleNeeded;
+
+  to.matched.some(record => roleNeeded = record.meta.roleNeeded)
+
+  if (roleNeeded == 'blogger' && usersRole !== 'blogger') {
+    next('/settings')
+  // } else if (roleNeeded == -1 && usersRole === true) {
+  //   next('/home')
+  } else {
+    next()
+  }
 
 
 })
