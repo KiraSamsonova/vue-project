@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express');
 const router = express.Router()
 const User = require('../models/user')
-const Emails = require('../models/Emails')
+const Emails = require('../models/emails')
 const Advertiser = require('../models/advertiser')
 const Blogger = require('../models/blogger')
 const passport = require('passport');
@@ -67,7 +67,7 @@ router.post('/createNewProfile', (req, res) => {
                 description: b.description,
                 image: 'default',
                 instagram: b.instagram,
-                telegram: telegram,
+                telegram: b.telegram,
                 showInCommunication: b.showInCommunication,
                 themes: b.themes,
                 subscribersNumber: b.subscribersNumber,
@@ -116,7 +116,7 @@ router.post('/uploadBloggersImage',passport.authenticate('jwt', { session: false
         console.log(forWho)
         let id = { _id: forWho }
         
-        idDebugger(id, (isValid) => {
+        idDebugger(forWho, (isValid) => {
 
             if (!isValid) return res.json({ success: false, msg: 'id не верен на этапе получения параметра' })
 
@@ -258,4 +258,5 @@ router.post('/allProfiles', passport.authenticate('jwt', { session: false }), (r
         return res.status(403).send({ success: false, msg: 'Unauthorized.' });
     }
 })
+
 module.exports = router;

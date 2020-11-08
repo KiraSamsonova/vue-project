@@ -5,7 +5,7 @@ export default {
         async fetchAllBloggers(ctx, filtersValue = {}) {
 
             const res = await axios({
-                url: 'http://localhost:8080/bloggers/allBloggers', data: filtersValue, method: 'POST'
+                url: '/bloggers/allBloggers', data: filtersValue, method: 'POST'
             })
                 .then(response => {
                     console.log(response.data)
@@ -23,7 +23,7 @@ export default {
         async axiosBloggerById(ctx, id) {
 
             await axios.post(
-                'http://localhost:8080/bloggers/findBloggerById', { id: id }
+                '/bloggers/findBloggerById', { id: id }
             )
                 .then(response => {
 
@@ -51,7 +51,8 @@ export default {
             //     return b.subscribersNumber-a.subscribersNumber
             //   })
 
-            let r = response.concat(response, response,response, response )
+            let r = response
+            // .concat(response, response,response, response )
               state.allBloggers = r.sort((a, b) => {
                 return b.subscribersNumber-a.subscribersNumber
               })

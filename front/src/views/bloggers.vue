@@ -9,7 +9,7 @@
         <div class="bloggers__row">
           <h1 class="bloggers__title">Поиск по блогерам</h1>
 
-          <router-link class="bloggers__enter-link" :to="'/dashboard'">
+          <router-link v-if="!getUser._id" class="bloggers__enter-link" :to="'/login'">
 
             <span class="bloggers__enter">Вход</span> 
 
@@ -27,6 +27,22 @@
             
           </router-link>
 
+          <div v-if="getUser._id" class="enter-link bloggers__enter-link" v-on:click="logout()">
+
+            <span class="bloggers__enter">Выход</span> 
+
+            <svg version="1.1" id="Layer_2" class="bloggers__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                viewBox="0 0 18 18" style="enable-background:new 0 0 18 18;" xml:space="preserve">
+                <g>
+                    <path d="M16.4,0C16.3,0,16.3,0,16.4,0L8.3,0C7,0,6,1,6,2.3V3c0,0.4,0.3,0.8,0.7,0.8S7.5,3.4,7.5,3V2.3c0-0.4,0.3-0.7,0.8-0.7h3.5
+                        l-0.2,0.1c-0.6,0.2-1,0.8-1,1.4v11.3H8.3c-0.4,0-0.8-0.3-0.8-0.7V12c0-0.4-0.3-0.7-0.7-0.7S6,11.6,6,12v1.5c0,1.2,1,2.3,2.3,2.3
+                        h2.3v0.7c0,0.8,0.7,1.5,1.5,1.5c0.2,0,0.3,0,0.5-0.1l4.5-1.5c0.6-0.2,1-0.8,1-1.4V1.5C18,0.6,17.2-0.1,16.4,0z"/>
+                    <path d="M8,7L5,4C4.8,3.8,4.5,3.7,4.2,3.8C3.9,3.9,3.8,4.2,3.8,4.5v2.3h-3C0.3,6.8,0,7.1,0,7.5c0,0.4,0.3,0.8,0.7,0.8h3v2.3
+                        c0,0.3,0.2,0.6,0.5,0.7C4.5,11.3,4.8,11.2,5,11l3-3C8.3,7.7,8.3,7.3,8,7z"/>
+                </g>
+            </svg>
+            
+        </div>
         </div>
 
         <div class="bloggers__row bloggers__row-mt">          
@@ -220,8 +236,8 @@
 
 
     methods: { 
-
       ...mapMutations(['changePage']),
+      ...mapActions(["logout"]),
 
       paginate(number) {
         this.changePage(number)

@@ -375,7 +375,7 @@
 
       </div>
 
-      <div class="row_last" v-bind:class="{'error error_row error_telegramm': $v.telegram.$error}">
+      <div class="row_last" v-bind:class="{'error error_row error_telegramm': $v.telegramm.$error}">
 
         <label for="telegramm" class="label">Telegram:</label>
 
@@ -453,7 +453,7 @@
           </div>
           
           <p class="download-modal__text">
-            Вы можете загрузить изображение в формате JPG, GIF или PNG. Максимальный размер файла 500 КБ. Оптимальный размер фотографии 120х120 пикселей. Для лучшего отображения выбирайте квадратную фотографию.
+            Вы можете загрузить изображение в формате JPG, GIF или PNG. Максимальный размер файла 5 МБ. Оптимальный размер фотографии 120х120 пикселей. Для лучшего отображения выбирайте квадратную фотографию.
           </p>
 
           
@@ -491,12 +491,12 @@
         downloadErrorText: '',
 
         ageMin: 2,
-        ageMax: 8,
+        ageMax: 7,
         chosenOptionsAges: [],
 
         description: '',
         instagram: '',
-        telegram: '',
+        telegramm: '',
         showInCommunication: false,
         themes: [],
         isChecked: false,
@@ -523,7 +523,7 @@
       instagram: {
         required,
       },
-      telegram: {
+      telegramm: {
         required,
       },
       engagement: {
@@ -633,7 +633,7 @@
         console.log(ext)
         if (ext === 'png' || ext === 'jpg' || ext === 'jpeg') {
 
-        if(event.target.files[0].size >= 5000000) return this.downloadErrorText = 'файл слишком большой'
+        if(event.target.files[0].size >= 5000000) return this.downloadErrorText = 'Файл слишком большой'
         
         this.downloadErrorText = ''
         this.downloadModalActive = false
@@ -644,7 +644,7 @@
         this.fileURL = URL.createObjectURL(file)
         console.log(this.fd)
 
-        } else this.downloadErrorText = 'problem with fileExtension'
+        } else this.downloadErrorText = 'Недопустимое разрешение файла'
       },
 
       createNewProfile() {
@@ -672,7 +672,7 @@
           AveragePost:this.AveragePost,
           AverageStory: this.AverageStory,
           engagement: this.engagement,
-          telegram: this.telegram,
+          telegram: this.telegramm,
           postPrice: this.postPrice,
           storyPrice: this.storyPrice,
           isCoopReady: this.isCoopReady

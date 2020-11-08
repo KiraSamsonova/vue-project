@@ -5,14 +5,18 @@ export default {
         async axiosEmailConfirmation(ctx, confirmLink) {
 
             await axios.post(
-                'http://localhost:8080/account/confirmEmail', { confirmLink: confirmLink },
+                '/account/confirmEmail', { confirmLink: confirmLink },
             )
                 .then(response => {
                     let r = response.data
                     console.log(r)
-                    if (!r.success)
-                        alert('err')
+
+                    if (r.success){
+                        ctx.commit('changeIsConfirmed')
+                        router.push('/home')
+                    }
                     else {
+                        alert('Ссылка не валидна')
                         router.push('/home')
                     }
                 })

@@ -5,7 +5,7 @@ export default {
         async axiosNewPassLink(ctx, value) {
 
             await axios.post(
-                'http://localhost:8080/account/createNewPassLink', { email: value },
+                '/account/createNewPassLink', { email: value },
             )
                 .then(response => {
                     

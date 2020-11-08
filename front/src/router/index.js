@@ -102,6 +102,13 @@ const routes = [
     component: () => import('../views/home.vue')
   },
 
+  {
+    path: '/:anything',
+    name: '',
+    meta: { layout: 'main', auth: 0, roleNeeded: 0 },
+    component: () => import('../views/home.vue')
+  },
+
 ]
 
 const router = new VueRouter({

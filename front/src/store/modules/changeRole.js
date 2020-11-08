@@ -9,7 +9,7 @@ export default {
         }
         console.log(changeRole)
         await axios.post(
-            'http://localhost:8080/account/changeRole', { changeRole: changeRole },
+            '/account/changeRole', { changeRole: changeRole },
         )
             .then(response => {
  

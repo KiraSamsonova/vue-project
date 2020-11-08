@@ -5,7 +5,7 @@ export default {
         async axiosGetAllThemes(ctx) {
 
             await axios.post(
-                'http://localhost:8080/themes/getAllThemes',
+                '/themes/getAllThemes',
             )
                 .then(response => {
 

@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '@/router/index.js'
 export default {
 
     actions: {
@@ -9,7 +10,7 @@ export default {
             let fd = arr[0]
             console.log(fd)
             await axios.post(
-                'http://localhost:8080/profiles/createNewProfile', value,
+                '/profiles/createNewProfile', value,
             )
                 .then(response => {
                     let r = response.data
@@ -40,7 +41,7 @@ export default {
             console.log('dispatched!')
             console.log(fd)
             await axios.post(
-                'http://localhost:8080/profiles/uploadBloggersImage', fd
+                '/profiles/uploadBloggersImage', fd
             )
                 .then(response => {
                     let r = response.data
@@ -48,6 +49,8 @@ export default {
                     if (r.success)
                         // ctx.commit('newImageTest', r.fileName)
                         console.log('success')
+                        router.push('/home')
+                        
 
                 })
                 .catch(error => {

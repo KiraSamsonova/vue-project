@@ -5,7 +5,7 @@ export default {
         async fetchReg(ctx, value = {}) {
             ctx.commit('emailIsInUse', '')
             const res = await fetch(
-                'http://localhost:8080/account/registration', {
+                '/account/registration', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached

@@ -103,7 +103,7 @@
         required,
       },    
     },
-  
+
       methods: { 
         ...mapActions(["axiosAuth", ]),
         ...mapMutations(["auth_error"]),

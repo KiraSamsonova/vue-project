@@ -57,24 +57,40 @@
 
       <router-link :to="`/editProfile?id=${profile._id}`" class="single-content__link">
 
-      <svg version="1.1" class="single-content__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        viewBox="0 0 11 11" style="enable-background:new 0 0 11 11;" xml:space="preserve">
+        <svg version="1.1" class="single-content__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          viewBox="0 0 11 11" style="enable-background:new 0 0 11 11;" xml:space="preserve">
 
-        <g>
-          <rect x="7.3" y="0.8" transform="matrix(0.7071 -0.7071 0.7071 0.7071 0.8246 6.5655)" class="st2" width="2.1" height="3.1"/>
-          <polygon class="st2" points="5.8,2.7 1.7,6.8 1.2,9.5 3.9,8.9 8,4.8 	"/>
-        </g>
-      </svg>
+          <g>
+            <rect x="7.3" y="0.8" transform="matrix(0.7071 -0.7071 0.7071 0.7071 0.8246 6.5655)" class="st2" width="2.1" height="3.1"/>
+            <polygon class="st2" points="5.8,2.7 1.7,6.8 1.2,9.5 3.9,8.9 8,4.8 	"/>
+          </g>
+        </svg>
+
+        <div class="single-content__prompt-wrapper">
+          <div class="single-content__prompt-edit">
+            <p class="single-content__prompt-text">Редактировать</p>
+          </div>
+        </div>
 
       </router-link>
 
-      <svg v-on:click="deleteProfileById(profile._id)" version="1.1" class="single-content__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-        viewBox="0 0 11 11" style="enable-background:new 0 0 11 11;" xml:space="preserve">
+      <div class="single-content__link">
 
-        <rect x="4.7" y="0" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -2.2782 5.5)" class="rect" width="1.7" height="11.1"/>
-        <rect x="0" y="4.7" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -2.2782 5.5)" class="rect" width="11.1" height="1.7"/>
-      
-      </svg>
+        <svg v-on:click="deleteProfileById(profile._id)" version="1.1" class="single-content__svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          viewBox="0 0 11 11" style="enable-background:new 0 0 11 11;" xml:space="preserve">
+
+          <rect x="4.7" y="0" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -2.2782 5.5)" class="rect" width="1.7" height="11.1"/>
+          <rect x="0" y="4.7" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -2.2782 5.5)" class="rect" width="11.1" height="1.7"/>
+        
+        </svg>
+
+        <div class="single-content__prompt-wrapper">
+          <div class="single-content__prompt-delete">
+            <p class="single-content__prompt-text">Удалить</p>
+          </div>
+        </div>
+
+      </div>
     </div>
 
    
@@ -95,7 +111,6 @@ export default {
   },
 
   mounted() {
-    console.log(JSON.parse(localStorage.getItem('user'))._id)
     this.fetchAllProfiles(JSON.parse(localStorage.getItem('user'))._id)
   },
 
@@ -111,7 +126,6 @@ export default {
   },
 }
 </script>
-
 
 <style lang="scss" scoped>
 
@@ -181,6 +195,10 @@ export default {
 
     &__link {
       margin-bottom: -1px;
+      position: relative;
+    }
+    &__link:hover &__prompt-wrapper {
+      display: block;
     }
     
     &__svg {
@@ -198,6 +216,44 @@ export default {
         .st3{fill:black;}
         .rect{fill:black;}
       }
+    }
+
+    &__prompt-wrapper {
+      display: none;
+      padding-bottom: 3px;
+      position: absolute;
+      bottom: 100%;
+      left: -4px;
+    }
+
+    &__prompt-edit {
+      width: 105px;
+      height: 30px;
+      
+      border-radius: 4px;
+      box-shadow:2.487px 1.678px 5px rgba(22,19,21,0.14);
+      background-color: #f8f8f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    &__prompt-delete {
+      width: 70px;
+      height: 30px;
+      
+      border-radius: 4px;
+      box-shadow:2.487px 1.678px 5px rgba(22,19,21,0.14);
+      background-color: #f8f8f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+
+    &__prompt-text {
+      font-size: 11px;
+      color: #000;
+
     }
   }
 

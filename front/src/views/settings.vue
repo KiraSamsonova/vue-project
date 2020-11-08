@@ -227,7 +227,8 @@
     mounted() {
       this.email = this.getUser.email
       this.password = this.getUser.password
-
+      // alert(this.getUser.isConfirmed)
+      console.log(this.getUser)
     },
   
     methods: { 

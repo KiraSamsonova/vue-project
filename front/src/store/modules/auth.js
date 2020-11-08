@@ -6,7 +6,7 @@ export default {
         async axiosAuth(ctx, value) {
             ctx.commit('auth_request')
             const res = await axios({
-                url: 'http://localhost:8080/account/authentification', data: value, method: 'POST'
+                url: '/account/authentification', data: value, method: 'POST'
             })
                 .then(response => {
                     let r = response.data
@@ -72,6 +72,7 @@ export default {
         logout(state) {
             state.status = ''
             state.token = ''
+            state.user = {}
         },
         
         changeEmail(state, updatedData) {
@@ -99,8 +100,16 @@ export default {
             state.user.password = password
             console.log(state.user)
             localStorage.setItem('user', JSON.stringify(state.user))
-        }
+        },
 
+        changeIsConfirmed(state) {
+            if(!!state.token) {
+                console.log(state.user)
+                state.user.isConfirmed = true
+                console.log(state.user)
+                localStorage.setItem('user', JSON.stringify(state.user))
+            }
+        }
     },
     state: {
         errMsg: "",

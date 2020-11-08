@@ -450,7 +450,7 @@
       return {
         themesModalActive: false,
         ageMin: 2,
-        ageMax: 8,
+        ageMax: 7,
         chosenOptionsAges: [],
         filtersActive: false,
         themes: [],

@@ -38,7 +38,7 @@
 
               </router-link>
 
-              <router-link :to="'/home'" class="big-links-group__single">
+              <router-link v-if="!getUser._id" :to="'/registration'" class="big-links-group__single">
 
                 <svg version="1.1" class="big-links-group__svg" id="sign-up-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                   viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
@@ -67,7 +67,7 @@
 
               </router-link>
 
-              <router-link :to="'/home'" class="big-links-group__single">
+              <router-link v-if="!getUser._id" :to="'/login'" class="big-links-group__single">
 
                 <svg version="1.1" class="big-links-group__svg" id="enter-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                   viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
@@ -80,8 +80,42 @@
                   </g>
                 </svg>
 
-
                 <span class="big-links-group__text">Вход</span>
+
+              </router-link>
+
+              <router-link v-if="getUser._id" :to="'/login'" class="big-links-group__single">
+
+                <svg version="1.1" class="big-links-group__svg" id="for-bloger-svg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                  viewBox="0 0 22 22" style="enable-background:new 0 0 22 22;" xml:space="preserve">
+                  <g>
+                    <circle cx="7.9" cy="5.3" r="4.1"/>
+                    <path d="M11.7,20.8l2.1-0.2l4.8-4.8l-2.5-2.5L11.3,18l-0.2,2.1C11.1,20.5,11.3,20.8,11.7,20.8C11.7,20.8,11.7,20.8,11.7,20.8z"/>
+                    <path d="M20.8,12.3L19.5,11c-0.3-0.3-0.9-0.3-1.2,0L17,12.3l-0.1,0.1l2.5,2.5l1.5-1.5C21.2,13.2,21.2,12.6,20.8,12.3z"/>
+                    <g>
+                      <path d="M11.2,19.2h2c1,0,1.7-0.8,1.7-1.7V15c0-0.2,0-0.4-0.1-0.5L11.3,18L11.2,19.2z"/>
+                      <path d="M9.3,17.8l0.1-0.7l0.5-0.5l4.1-4.1c-0.8-1-2-1.7-3.3-1.7h-0.3c-0.8,0.4-1.6,0.6-2.5,0.6s-1.7-0.2-2.5-0.6H5.1
+                      c-2.3,0-4.2,1.9-4.2,4.2v2.4c0,1,0.8,1.7,1.7,1.7h6.5L9.3,17.8z"/>
+                    </g>
+                  </g>
+                </svg>
+
+                <span class="big-links-group__text">Личный кабинет</span>
+
+              </router-link>
+
+              <router-link v-if="getUser._id" :to="'/login'" class="big-links-group__single">
+
+                <svg data-v-7ad3b522="" class="big-links-group__svg" version="1.1" id="Layer_2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 18 18" xml:space="preserve" >
+                  <g data-v-7ad3b522="">
+                  <path data-v-7ad3b522="" d="M16.4,0C16.3,0,16.3,0,16.4,0L8.3,0C7,0,6,1,6,2.3V3c0,0.4,0.3,0.8,0.7,0.8S7.5,3.4,7.5,3V2.3c0-0.4,0.3-0.7,0.8-0.7h3.5
+                    l-0.2,0.1c-0.6,0.2-1,0.8-1,1.4v11.3H8.3c-0.4,0-0.8-0.3-0.8-0.7V12c0-0.4-0.3-0.7-0.7-0.7S6,11.6,6,12v1.5c0,1.2,1,2.3,2.3,2.3
+                    h2.3v0.7c0,0.8,0.7,1.5,1.5,1.5c0.2,0,0.3,0,0.5-0.1l4.5-1.5c0.6-0.2,1-0.8,1-1.4V1.5C18,0.6,17.2-0.1,16.4,0z"></path><path data-v-7ad3b522="" d="M8,7L5,4C4.8,3.8,4.5,3.7,4.2,3.8C3.9,3.9,3.8,4.2,3.8,4.5v2.3h-3C0.3,6.8,0,7.1,0,7.5c0,0.4,0.3,0.8,0.7,0.8h3v2.3
+                    c0,0.3,0.2,0.6,0.5,0.7C4.5,11.3,4.8,11.2,5,11l3-3C8.3,7.7,8.3,7.3,8,7z"></path>
+                    </g>
+                </svg>
+
+                <span class="big-links-group__text">Выход</span>
 
               </router-link>
 
@@ -166,7 +200,7 @@
           </nav>
 
           <div class="menu__banner-wrapper">
-            <img src="@/assets/uploads/5ec50488dea727389ca678eb.png" alt="" class="menu__banner-img">
+            <img src="@/assets/uploads/black.png" alt="" class="menu__banner-img">
           </div>
 
           <footer class="menu__footer">
@@ -207,10 +241,10 @@
 </template>
 
 <script>
-  import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock';
-
+  import { disableBodyScroll, enableBodyScroll, clearAllBodyScrollLocks } from 'body-scroll-lock'
   import 'simplebar'; // or "import SimpleBar from 'simplebar';" if you want to use it manually.
   import 'simplebar/dist/simplebar.css';
+  import {mapGetters,mapActions} from 'vuex'
 
   export default {
     name: 'YellowMenu',
@@ -222,6 +256,7 @@
       }
      },
 
+    computed: mapGetters(["getUser",]),
     methods: {
       showMenu() {
         this.menuActive = true

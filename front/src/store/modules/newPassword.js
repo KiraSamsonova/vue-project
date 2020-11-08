@@ -6,7 +6,7 @@ export default {
             console.log(ctx.getters.passLink)
             // 
             await axios.post(
-                'http://localhost:8080/account/passLinkCheck', { passLink: ctx.getters.passLink },
+                '/account/passLinkCheck', { passLink: ctx.getters.passLink },
             )
                 .then(response => {
                     let r = response.data
@@ -23,7 +23,7 @@ export default {
             console.log(ctx.getters.passLink)
             console.log(newPass)
             await axios.post(
-                'http://localhost:8080/account/newPassSave', { passLink: ctx.getters.passLink, newPass: newPass },
+                '/account/newPassSave', { passLink: ctx.getters.passLink, newPass: newPass },
             )
                 .then(response => {
 

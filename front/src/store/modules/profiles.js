@@ -6,7 +6,7 @@ export default {
         async fetchAllProfiles(ctx, id = '') {
 
             const res = await axios({
-                url: 'http://localhost:8080/profiles/allProfiles', data: { id: id }, method: 'POST'
+                url: '/profiles/allProfiles', data: { id: id }, method: 'POST'
             })
                 .then(response => {
                     console.log(response.data)
@@ -27,7 +27,7 @@ export default {
 
         async  deleteProfile(ctx, id = '') {
             const res = await fetch(
-                'http://localhost:8080/profiles/deleteProfile', {
+                '/profiles/deleteProfile', {
                 method: 'POST', // *GET, POST, PUT, DELETE, etc.
                 mode: 'cors', // no-cors, *cors, same-origin
                 cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached

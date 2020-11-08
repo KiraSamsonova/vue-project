@@ -8,7 +8,7 @@ export default {
           let id = ctx.getters.getUser._id
           let password = ctx.getters.getUser.password
           await axios.post(
-            'http://localhost:8080/account/changeEmail', { newEmail: newEmail, id: id, password: password },
+            '/account/changeEmail', { newEmail: newEmail, id: id, password: password },
           )
             .then(response => {
               let r = response.data

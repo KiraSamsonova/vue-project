@@ -10,7 +10,6 @@
     name: 'emailConfirmation',
 
     mounted() {
-      alert('ja')
       const urlParams = new URLSearchParams(window.location.search);
       const confirmlink = urlParams.get('confirmlink')
       this.axiosEmailConfirmation(confirmlink)

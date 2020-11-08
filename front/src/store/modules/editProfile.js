@@ -9,7 +9,7 @@ export default {
         ctx.commit('loader')
         
         await axios.post(
-            'http://localhost:8080/profiles/getEditingProfileInfo', { userInfo, profileId}
+            '/profiles/getEditingProfileInfo', { userInfo, profileId}
         )
             .then(response => {
                 let r = response.data
@@ -36,7 +36,7 @@ export default {
         console.log(fd)
         console.log(editedProfile)
         await axios.post(
-            'http://localhost:8080/profiles/replaceOneProfile', editedProfile,
+            '/profiles/replaceOneProfile', editedProfile,
         )
             .then(response => {
               let r = response.data

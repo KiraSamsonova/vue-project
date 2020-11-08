@@ -3,7 +3,7 @@ const bcrypt = require('bcryptjs');
 const express = require('express');
 const router = express.Router()
 const User = require('../models/user')
-const Emails = require('../models/Emails')
+const Emails = require('../models/emails')
 const Advertiser = require('../models/advertiser')
 const Blogger = require('../models/blogger')
 const passport = require('passport');
@@ -143,7 +143,7 @@ router.post('/changeEmail', passport.authenticate('jwt', { session: false }), (r
                     if (isMatch) {
 
                     // ПРОВЕРЯЕМ АУТЕНТИЧНОСТЬ EMAIL
-                    User.getUserByEmail(req.body.newEmail, (err, user) => {
+                    User.getUserByEmail(newEmail, (err, user) => {
                         if (err) throw err
                         if (user) return res.json({ success: false, msg: 'Пользователь с таким email уже существует' })
 
@@ -155,7 +155,7 @@ router.post('/changeEmail', passport.authenticate('jwt', { session: false }), (r
                             if (emailArr.includes(newEmail)) isParticipant = true
 
                             bcrypt.genSalt(10, (err, salt) => {
-                                bcrypt.hash(email, salt, (err, hash) => {
+                                bcrypt.hash(newEmail, salt, (err, hash) => {
                                     if (err) throw err
                                     // passlink creation process
                                     let emailConfirmLink = hash
@@ -167,7 +167,7 @@ router.post('/changeEmail', passport.authenticate('jwt', { session: false }), (r
                                             console.log(response)
                                             return res.json({ success: false, msg: 'smth got absolutely wrong' })
                                         }
-                                    // mailer.registrationEmailConfirmation(newEmail, id)
+                                        mailer.registrationEmailConfirmation(newEmail, emailConfirmLink)
                                         return res.json({ success: true, msg: 'email изменен', email: newEmail, isParticipant: isParticipant })
 
                                     })
@@ -242,6 +242,7 @@ router.post('/authentification', (req, res) => {
             if (isMatch) {
                 const token = jwt.sign(user.toJSON(), config.secret);
                 user.password = undefined
+                user.emailConfirmLink = undefined
                 return res.json({ success: true, token: 'JWT ' + token, user: user });
 
             } else {

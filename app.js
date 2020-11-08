@@ -14,12 +14,12 @@ const profiles = require('./routes/profiles');
 const bloggers = require('./routes/bloggers');
 const themes = require('./routes/themes');
 
-const Emails = require('./models/Emails')
+const Emails = require('./models/emails')
 const Themes = require('./models/themes')
 
 
 
-const port = process.env.PORT || 8080
+const port = process.env.PORT || 3000
 
 //для работы с POST-запросами
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
@@ -51,10 +51,10 @@ mongoose.connection.on('error', (err) => {
 
 //partisipants.newFunc() 
 
-// app.use(express.static(__dirname + '/public/'));
+app.use(express.static(__dirname + '/public/'));
 
-// // Handle SPA
-// app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
+// Handle SPA
+app.get(/.*/, (req, res) => res.sendFile(__dirname + '/public/index.html'));
 
 
 app.listen(port, () => {

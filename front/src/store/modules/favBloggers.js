@@ -5,7 +5,7 @@ export default {
         async axiosFavBloggers(ctx, favArr) {
 
             await axios.post(
-                'http://localhost:8080/bloggers/showFavBloggers', { favArr: favArr },
+                '/bloggers/showFavBloggers', { favArr: favArr },
             )
                 .then(response => {
 
@@ -29,7 +29,7 @@ export default {
             }
             console.log(FavObj)
             await axios.post(
-                'http://localhost:8080/bloggers/SaveFavBloggers', { FavObj: FavObj },
+                '/bloggers/SaveFavBloggers', { FavObj: FavObj },
             )
                 .then(response => {
 
